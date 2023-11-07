@@ -1,6 +1,14 @@
 {
   "expo": {
-    "name": "tripviso",
-    "slug": "tripviso"
+    "name": "RateBot AI PMS",
+    "slug": "hotelogix",
+    "extra": {
+      "eas": {
+        "projectId": "fd3e3e72-4789-4c68-bbbd-05c725539eef"
+      }
+    },
+    "android": {
+      "package": "com.easydigitals.hotelogix"
+    }
   }
 }

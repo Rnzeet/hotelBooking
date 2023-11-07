@@ -3,7 +3,9 @@ import React from 'react'
 
 const Product = () => {
   return (
-    <View style={{backgroundColor:"magenta"}}>
+    <View style={
+      {backgroundColor:"magenta"}
+      }>
       <Text>Product</Text>
     </View>
   )

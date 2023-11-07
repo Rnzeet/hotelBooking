@@ -7,6 +7,7 @@ import { NavigationContainer } from "@react-navigation/native";
 
 import "react-native-gesture-handler"
 import AppStack from './src/AppStack';
+import AuthNavigator from './src/authNavigator/AuthNavigator';
 
 
 const lightColors = {
@@ -116,14 +117,14 @@ const darkTheme = {
 
 export default function App() {
 
-  
+
   return (
-    
-      <NavigationContainer>
-         <PaperProvider theme={lightTheme}> 
+
+    <NavigationContainer>
+      <PaperProvider theme={lightTheme}>
         <SplashScreen />
-        <AppStack/>
-        </PaperProvider>
-     </NavigationContainer> 
+        <AuthNavigator />
+      </PaperProvider>
+    </NavigationContainer>
   );
 }

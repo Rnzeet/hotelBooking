@@ -1,11 +1,18 @@
-import { View, Text } from 'react-native'
+import { View, Text, SafeAreaView } from 'react-native'
 import React from 'react'
+import NavigationHead from './components/NavigationHead'
 
-const Home = () => {
+const Home = ({navigation}) => {
+  handleBackPress = () => {
+    navigation.goBack();
+  }
+
   return (
-    <View>
-      <Text>Home</Text>
-    </View>
+    <SafeAreaView>
+      <NavigationHead heading="Home" 
+      onBackPress={handleBackPress}
+      />
+    </SafeAreaView>
   )
 }
 
