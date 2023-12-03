@@ -15,11 +15,30 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
+import { userDataRemover } from "./APIS/Context";
 
 const CustomDrawer = (props) => {
   const [logoPath, setLogoPath] = useState(null);
   const [hotelName, setHotelName] = useState("");
   const [hotelCode, setHotelCode] = useState("");
+  const logOut = async () => {
+
+    try {
+     const res = await userDataRemover();
+     console.log(res)
+     if(res){
+      alert("Logout Successfully")
+       props.navigation.navigate('login')
+     }
+     else{
+       alert("Something went wrong")
+       props.navigation.navigate('login')
+     }
+    } catch (error) {
+      alert(error)
+    }
+ 
+   }
 
   // Retrieve the data from AsyncStorage
   AsyncStorage.getItem('userData')
@@ -86,45 +105,12 @@ const CustomDrawer = (props) => {
           <DrawerItemList {...props} />
         </View>
       </DrawerContentScrollView>
-      <View
-        style={{
-          borderTopWidth: 1,
-          borderTopColor: "#ccc",
-          // backgroundColor: colors.cardbackground,
-        }}
-      >
-        <Text style={styles.preferences}>Preferences</Text>
-        <View style={styles.switchTextContainer}>
-          <Switch
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor="#f4f3f4"
-            style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }}
-          />
-          <Text
-            style={{
-              fontSize: 15,
-            }}
-          >
-            Dark Theme
-          </Text>
-        </View>
-      </View>
+      
       <View style={{ padding: 20, borderTopWidth: 1, borderTopColor: "#ccc" }}>
-        <TouchableOpacity onPress={() => { }} style={{ paddingVertical: 15 }}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Ionicons name="share-social-outline" size={22} />
-            <Text
-              style={{
-                fontSize: 15,
-
-                marginLeft: 5,
-              }}
-            >
-              Tell a Friend
-            </Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={{ paddingVertical: 15 }}>
+        
+        <TouchableOpacity style={{ paddingVertical: 15 }}
+         onPress={() => {logOut()}}
+        >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Ionicons name="exit-outline" size={22} />
             <Text

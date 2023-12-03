@@ -1,61 +1,72 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
-import { Modal } from 'react-native-paper';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 const RoomTypeCard = (props) => {
   const [remainingRoom, setRemainingRoom] = useState(props.remainingRooms);
   const [selectedRooms, setSelectedRooms] = useState(0);
 
-
-  const [visible, setVisible] = useState(false);
-
   const handleCardPress = () => {
+    props.onRoomTypePress();
     if (remainingRoom > 0) {
-      setSelectedRooms(selectedRooms + 1);
+      const newSelectedRooms = selectedRooms + 1;
+      setSelectedRooms(newSelectedRooms);
       setRemainingRoom(remainingRoom - 1);
 
+      // Calculate the price based on the new count
+      const newPrice = newSelectedRooms * props.price;
+      console.log(newPrice)
+
       // Pass the selected room details back to the parent component
       props.onRoomSelected({
         type: props.roomType,
-        count: selectedRooms + 1,
-        price: props.price,
-        room: props.room
+        count: newSelectedRooms,
+        price: newPrice,
+        room: props.room,
+        room_type_id: props.room_type_id,
       });
     }
   };
+
   const handleMinusPress = () => {
     if (selectedRooms > 0) {
-      setSelectedRooms(selectedRooms - 1);
+      const newSelectedRooms = selectedRooms - 1;
+      setSelectedRooms(newSelectedRooms);
       setRemainingRoom(remainingRoom + 1);
-  
+
       // Calculate the price based on the new count
-      const newPrice = (selectedRooms - 1) * props.price;
-  
+      const newPrice = newSelectedRooms * props.price;
+
       // Pass the selected room details back to the parent component
       props.onRoomSelected({
         type: props.roomType,
-        count: selectedRooms - 1,
+        count: newSelectedRooms,
         price: newPrice,
+        room: props.room,
+        room_type_id: props.room_type_id,
       });
     }
   };
-  
+
   return (
     <TouchableOpacity onPress={handleCardPress} style={styles.container}>
       <View style={styles.card}>
         <View style={styles.count}>
-          <Text style={{
-            alignItems: 'center',
-            fontWeight: 'bold',
-            color: "white",
-            fontSize: 20
-          }}>
+          <Text
+            style={{
+              alignItems: 'center',
+              fontWeight: 'bold',
+              color: 'white',
+              fontSize: 20,
+            }}
+          >
             {`${selectedRooms}/${remainingRoom}`}
           </Text>
         </View>
         <View>
           <Text>{props.roomType}</Text>
-          <Text>Base: {props.base} Max: {props.max}</Text>
+          <Text>
+            Base: {props.base} Max: {props.max}
+          </Text>
         </View>
         <Text>${props.price}</Text>
         {selectedRooms > 0 && ( // Show minus button when at least one room is selected
@@ -64,13 +75,11 @@ const RoomTypeCard = (props) => {
           </TouchableOpacity>
         )}
       </View>
-
     </TouchableOpacity>
+  );
+};
 
-  )
-}
-
-export default RoomTypeCard
+export default RoomTypeCard;
 
 const styles = StyleSheet.create({
   container: {
@@ -114,4 +123,4 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-})
+});

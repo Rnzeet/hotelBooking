@@ -2,22 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
+import { firstLastCharater } from './SimpleCard';
 
 
-const RoomStatus = (checkInDatas) => {
-  if (checkInDatas.room_booking_info.room_title === "Standard Room Testing") {
-    return "ST";
-  }
-  else if (checkInDatas.room_booking_info.room_title === "Dulex Room") {
-    return "DR";
-  }
-  else if (checkInDatas.room_booking_info.room_title === "AC single room") {
-    return "ACSR";
-  }
-  else {
-    return "MULTI"
-  }
-}
 const CheckInCard = ({ checkInDatas }) => {
   const [isModalVisible, setModalVisible] = useState(false);
 
@@ -25,10 +12,14 @@ const CheckInCard = ({ checkInDatas }) => {
     setModalVisible(!isModalVisible);
   };
 
+  const close = () => {
+    setModalVisible(false);
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.roomType}>
-        <Text>{RoomStatus(checkInDatas)}</Text>
+        <Text>{firstLastCharater(checkInDatas?.room_booking_info?.room_title)}</Text>
       </View>
       <View>
         <Text>{checkInDatas.guest_first_name}</Text>
@@ -71,6 +62,13 @@ const CheckInCard = ({ checkInDatas }) => {
             toggleModal();
           }} style={styles.redOption}>
             <Text style={styles.optionText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {
+            // Handle the Cancel action
+            // You can navigate to the Cancel screen or perform any other action
+            toggleModal();
+          }} style={styles.normalOption}>
+            <Text style={styles.optionText}>Close</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -134,6 +132,15 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     elevation: 2,
     alignItems: "center",
+    marginBottom: 10,
+  },
+  normalOption: {
+    backgroundColor: 'gray',
+    padding: 10,
+    borderRadius: 5,
+    elevation: 2,
+    alignItems: "center",
+    marginBottom: 10,
   },
 });
 

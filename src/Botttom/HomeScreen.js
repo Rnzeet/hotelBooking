@@ -1,8 +1,10 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, RefreshControl } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FontAwesome5,FontAwesome } from '@expo/vector-icons';
 import DatePickerComp from '../components/DateTimePicker';
 import { userDataRemover } from '../APIS/Context';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const HomeScreen = ({navigation}) => {
@@ -10,24 +12,70 @@ const HomeScreen = ({navigation}) => {
   const [selectedDate, setSelectedDate] = useState(currDate);
   const [currTime, setCurrTime] = useState(new Date().toLocaleTimeString());
   const [refreshing, setRefreshing] = React.useState(false);
+  const [hotelCode, setHotelCode] = useState('');
+  const [checkIns, setCheckIns] = useState('');
+  const [checkOuts, setCheckOuts] = useState('');
 
-  const logOut = async () => {
+  // Retrieve the data from AsyncStorage
+  AsyncStorage.getItem('userData')
+    .then((userDataString) => {
+      if (userDataString) {
+        // Convert the stored string back to an object (you can use JSON.parse)
+        const userData = JSON.parse(userDataString);
+        setHotelCode(userData.hotel_code)
+        // console.log('User Data:', logoPath);
+      } else {
+        console.log('User data not found.');
+      }
+    })
+    .catch((error) => {
+      console.error('Error retrieving user data:', error);
+    });
 
-   try {
-    const res = await userDataRemover();
-    console.log(res)
-    if(res){
-      navigation.navigate('login')
+
+
+
+  const fetchData = async () => {
+    setRefreshing(true);
+
+    const apiUrl1 = 'https://api.ratebotai.com:8443/get_check_out_orders';
+
+    const postData = {
+      from_date: selectedDate,
+      to_date: currDate,
+      hotel_code: hotelCode,
+    };
+
+    try {
+      const response = await axios.post(apiUrl1, postData);
+      setCheckOuts(response.data.data.length);
+    } catch (error) {
+      alert('Error fetching room types:', error);
     }
-    else{
-      alert("Something went wrong")
-      navigation.navigate('login')
-    }
-   } catch (error) {
-     alert(error)
-   }
 
-  }
+
+    const apiUrl = 'https://api.ratebotai.com:8443/get_check_in_orders';
+   
+    try {
+      const response = await axios.post(apiUrl, postData);
+      setCheckIns(response.data.data.length);
+      console.log(response.data.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+
+    setRefreshing(false);
+  };
+
+
+
+  useEffect(() => {
+    if (selectedDate) {
+      fetchData();
+    }
+  }, [selectedDate]);
+
+  
 
   const onRefresh = React.useCallback(() => {
    
@@ -35,6 +83,7 @@ const HomeScreen = ({navigation}) => {
     setTimeout(() => {
       setCurrTime(new Date().toLocaleTimeString());
       setSelectedDate(new Date().toISOString().slice(0, 10));
+      fetchData();
       setRefreshing(false);
       
     }, 2000);
@@ -63,48 +112,54 @@ const HomeScreen = ({navigation}) => {
            
         /> 
         </TouchableOpacity>
-        <View style={styles.count}>
+        <View >
           <Text style={{ alignItems: 'center', fontWeight: 'bold', fontSize: 25,color:"white" }}>{currTime}</Text>
         </View>
       </View>
       <TouchableOpacity style={styles.card}
          onPress={() => navigation.navigate('Check In List')}
       >
-        <FontAwesome5 name='key' size={45} color="#0186C1" />
+        <View style={{flexDirection:"row",justifyContent:"center",alignItems:"center"}}>
+
+        <FontAwesome5 name='key' size={45} color="#0186C1"  />
+        <Text style={styles.count}>
+          {checkIns}
+        </Text>
+        </View>
         <Text style={styles.txt}>
-             CHECKED IN
+             CHECKED IN 
         </Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.card}
        onPress={() => navigation.navigate('Check Out List')}
       >
-        <FontAwesome5 name="door-open" size={45} color="#0186C1" />
+        <View style={{flexDirection:"row",justifyContent:"center",alignItems:"center"}}>
+        <FontAwesome5 name='door-open' size={45} color="#0186C1"  />
+        <Text style={styles.count}>
+          {checkOuts}
+        </Text>
+        </View>
         <Text style={styles.txt}>
-          CHECKED OUT
+             CHECKED OUT 
         </Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.card}
-       onPress={() => navigation.navigate('Create Booking')}
+      onPress={()=> navigation.navigate('Create Booking')}
       >
-        <FontAwesome5 name="concierge-bell" size={45} color="#0186C1" />
+        <FontAwesome5 name="book" size={45} color="#0186C1" />
         <Text style={styles.txt}>
-           RESERVE
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.card}>
-        <FontAwesome5 name="shopping-cart" size={45} color="#0186C1" />
-        <Text style={styles.txt}>
-          POS
+          Create Booking
         </Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.card}
-       onPress={() => {logOut()}}
+        onPress={()=> navigation.navigate('Night Audit')}
       >
-        <FontAwesome5 name="power-off" size={25} color="red" />
-        <Text style={{color:"red"}}>
-            LOGOUT
+        <FontAwesome5 name="clock" size={45} color="#0186C1" />
+        <Text style={styles.txt}>
+          Night Audit
         </Text>
       </TouchableOpacity>
+     
 
     </ScrollView>
   )
@@ -138,7 +193,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
     width: "100%",
-    height: 100,
+    height: 110,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
@@ -148,7 +203,26 @@ const styles = StyleSheet.create({
     color:"black",
     fontWeight:"bold",
     fontSize:15
-  }
+  },
+  count: {
+    color: "red",
+    fontWeight: "bold",
+    fontSize: 20,
+    width: 35,
+    height: 35,
+    marginLeft: 5,
+    borderRadius: 50,
+    textAlign: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingBottom: 5, 
+    padding: 5,
+    backgroundColor: '#FECD00',
+
+
+    
+  },
+  
 });
 
 export default HomeScreen

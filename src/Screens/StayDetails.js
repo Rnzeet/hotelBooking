@@ -14,7 +14,7 @@ const StayDetails = ({ navigation, route }) => {
   const [hotelCode, setHotelCode] = useState('');
   const [bookingId, setBookingId] = useState('');
   const [taxIds, setTaxIds] = useState([]);
-  const [taxAmounts, setTaxAmounts] = useState([]);
+  const [taxAmounts, setTaxAmounts] = useState(0);
   const [serviceCharge, setServiceCharge] = useState(0);
   const [taxType, setTaxType] = useState([]);
   const [personDetails, setPersonDetails] = useState({
@@ -35,16 +35,20 @@ const StayDetails = ({ navigation, route }) => {
     const roomIds1 = [];
 
     rooms.forEach((rm) => {
+      console.log(rm,"rm")
       if(rm.count > 0) {
-        roomTypeIds1.push(rm.room.id);
-        roomIds1.push(rm.room.rooms.map((r) => r.id));
-        setServiceCharge(rm.room.service_charge);
+        roomTypeIds1.push(rm.room.room_type_id);
+        roomIds1.push(rm.room.id);
+        console.log(rm,"rm.roomType")
+        setServiceCharge(rm.roomType.service_charge);
         setTaxIds(rm.room.tax_ids);
         
       }
 
+
       setRoomTypeIds(roomTypeIds1);
       setRoomIds(roomIds1);
+      console.log(roomIds,roomTypeIds,"roomIds,roomTypeIds")
       
     })
   
@@ -108,9 +112,9 @@ const StayDetails = ({ navigation, route }) => {
           coupon_type: "",
           coupon_discount_amount: 0,
           total_without_tax: total+serviceCharge,
-          tax_amount: 0,
+          tax_amount: taxAmounts,
           total_services_amount: serviceCharge,
-          gross_amount: total,
+          gross_amount: total+serviceCharge+taxAmounts,
           minimum_advance: 0,
           paid_amount: 0,
           balance_amount: 0,
@@ -118,7 +122,7 @@ const StayDetails = ({ navigation, route }) => {
           first_name: personDetails.firstName,
           last_name: personDetails.lastName,
           email: personDetails.email,
-          visit_type: "",
+          visit_type: "hotel",
           address: personDetails.address,
           phone_number: personDetails.phone,
           mobile_number: personDetails.phone,
@@ -132,13 +136,13 @@ const StayDetails = ({ navigation, route }) => {
               no_of_adults: personDetails.adult,
               no_of_child: personDetails.child,
               no_of_rooms: count,
-              room_id: roomIds[0][0]
+              room_id: roomIds[0]
             }
           ],
     
           room_booking:[
             {
-              room_id: roomIds[0][0],
+              room_id: roomIds[0],
               no_of_pax: personDetails.adult + personDetails.child,
               no_of_adults: personDetails.adult,
               no_of_children: personDetails.child,
@@ -146,9 +150,9 @@ const StayDetails = ({ navigation, route }) => {
               total_sale_amount: total,
               discount_amount: 0,
               coupon_amount: 0,
-              total_without_tax: total,
-              tax_amount: 0,
-              gross_amount: total
+              total_without_tax: total+serviceCharge,
+              tax_amount: taxAmounts,
+              gross_amount: total+serviceCharge+taxAmounts
             }]
           ,
           booking_service: selectedServices

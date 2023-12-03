@@ -19,7 +19,7 @@ const TwoSectionBtn = ({ callCheckInAPI, total, count, link, navigation, rooms, 
           console.log(response.booking_id, 'response.status')
           if (response.status===true) {
             setBookingId(response.booking_id);
-            console.log(response.booking_id, 'response.status',bookingId)
+            console.log(response.booking_id, 'response.status',bookingId,"booking id")
 
             navigation.navigate(link, { dataToSend: { total, count, rooms, details, dates, bookingId } });
 

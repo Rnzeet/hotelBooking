@@ -7,13 +7,15 @@ import TwoSectionBtn from '../components/Buttons/TwoSectionBtn';
 import axios from 'axios';
 import NavigationHead from '../components/NavigationHead';
 
-export const getTotalDays = (checkInDate, checkOutDate) => {
+export const getTotalDays=(checkInDate, checkOutDate) => {
   const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
   const firstDate = new Date(checkInDate);
   const secondDate = new Date(checkOutDate);
+
   const diffDays = Math.round(Math.abs((firstDate - secondDate) / oneDay));
   return diffDays;
 }
+
 
 const RoomDetails = ({ navigation }) => {
   const currDate = new Date().toISOString().slice(0, 10);
@@ -22,7 +24,6 @@ const RoomDetails = ({ navigation }) => {
   const [checkOutDate, setCheckOutDate] = useState(currDate);
   const [activeOption, setActiveOption] = useState('Guest');
   const [roomTypes, setRoomTypes] = useState([]);
-  const [totalCount, setTotalCount] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [availableRooms, setAvailableRooms] = useState([]);
 
@@ -37,35 +38,6 @@ const RoomDetails = ({ navigation }) => {
     try {
       const response = await axios.post(apiUrl, postData);
       setRoomTypes(response.data.data);
-
-      // Process the response to include available room counts
-      // const roomTypesWithAvailableCounts = response.data.data.map((roomType) => {
-      //   const availableRoomsForType = await availableRoomsFetch(roomType.room_type_id);
-      //   return {
-      //     ...roomType,
-      //     availableRoomCount: availableRoomsForType.length,
-      //   };
-      // });
-
-      
-
-
-    // const roomTypesWithAvailableCounts = response.data.data.map((roomType) => {
-    //   const availableRoomsForType = availableRooms.filter(
-    //     (room) => room.room_type_id === roomType.room_type_id
-    //   );
-    //   return {
-    //     ...roomType,
-    //     availableRoomCount: availableRoomsForType.length,
-    //   };
-    // });
-    
-    // // Filter room types with available rooms
-    // const roomTypesWithAvailableRooms = roomTypesWithAvailableCounts.filter(
-    //   (roomType) => roomType.availableRoomCount > 0
-    // );
-
-    // console.log(roomTypesWithAvailableRooms, 'roomTypesWithAvailableRooms');
       setRefreshing(false);
     } catch (error) {
       alert('Error fetching rooms:', error);
@@ -73,7 +45,7 @@ const RoomDetails = ({ navigation }) => {
     }
   }
 
-  const availableRoomsFetch = async (roomid) => {
+  const availableRoomsFetch = async (roomid,price) => {
     try {
       const dataToSend = {
         pms_hotel_code: 100087,
@@ -86,11 +58,24 @@ const RoomDetails = ({ navigation }) => {
         'https://api.ratebotai.com:8443/check_rooms_availability_for_pms',
         dataToSend
       );
+      console.log(price,'price ass')
+      const updatedAvailableRooms = response.data.data.map((room) => ({
+        ...room,
+        price: price,
+      }));
+      
+      const updatedAvailableRoomWithNoSelectedRoom = updatedAvailableRooms.filter((room) => {
+        // Check if the room is not in the selected rooms
+        const isSelected = selectedRooms.some((selectedRoom) => selectedRoom.room_number === room.room_number);
+        
+        // Include the room in the result if it's not selected
+        return !isSelected;
+      });
+      
+      // Now, `updatedAvailableRoomWithNoSelectedRoom` contains rooms that are not already selected
+      
+      setAvailableRooms(updatedAvailableRoomWithNoSelectedRoom);
 
-      console.log(dataToSend, 'dataToSend');
-      console.log(response.data, 'response.data');
-
-      setAvailableRooms(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -104,45 +89,28 @@ const RoomDetails = ({ navigation }) => {
   const [totalPrice, setTotalPrice] = useState(0);
 
   const handleRoomSelected = (roomDetails) => {
-    const roomIndex = selectedRooms.findIndex(
-      (room) => room.type === roomDetails.type
-    );
-
-    const updatedSelectedRooms = [...selectedRooms];
-
-    if (roomIndex !== -1) {
-      updatedSelectedRooms[roomIndex] = {
-        ...roomDetails,
-        count: roomDetails.count,
-        price: roomDetails.count * roomDetails.price,
-      };
-    } else {
-      updatedSelectedRooms.push(roomDetails);
-    }
+    const updatedSelectedRooms = selectedRooms.map((room) => {
+      if (room.roomTypeID === roomDetails.roomTypeID) {
+        return {
+          ...room,
+          count: roomDetails.count,
+          price: roomDetails.count * roomDetails.price,
+        };
+      }
+      return room;
+    });
 
     const newTotalPrice = updatedSelectedRooms.reduce(
       (total, room) => total + room.price,
       0
     );
 
-    const newTotalCount = updatedSelectedRooms.reduce(
-      (totalCount, room) => totalCount + room.count,
-      0
-    );
-
     setSelectedRooms(updatedSelectedRooms);
-    setTotalPrice(
-      getTotalDays(checkInDate, checkOutDate) !== 0
-        ? newTotalPrice * getTotalDays(checkInDate, checkOutDate)
-        : newTotalPrice
-    );
-    setTotalCount(newTotalCount);
+    setTotalPrice(newTotalPrice);
   };
 
   const onRefresh = () => {
-    setRefreshing(true);
     getRoomTypes();
-    setRefreshing(false);
   };
 
   const handleBackPress = () => {
@@ -154,42 +122,48 @@ const RoomDetails = ({ navigation }) => {
   };
 
   useEffect(() => {
+    console.log(selectedRooms,'selectedRooms')
     const newTotalPrice = selectedRooms.reduce(
       (total, room) => total + room.price,
       0
     );
+    console.log(newTotalPrice,'newTotalPrice')
+    setTotalPrice(newTotalPrice);
+  }, [selectedRooms]);
 
-    const newTotalCount = selectedRooms.reduce(
-      (totalCount, room) => totalCount + room.count,
-      0
-    );
-
-    setTotalPrice(
-      getTotalDays(checkInDate, checkOutDate) !== 0
-        ? newTotalPrice * getTotalDays(checkInDate, checkOutDate)
-        : newTotalPrice
-    );
-  }, [checkOutDate, selectedRooms]);
-
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRoomType, setSelectedRoomType] = useState(null);
 
   const handleRoomTypePress = (roomType) => {
+    console.log(roomType,'roomType')
     setSelectedRoomType(roomType);
-    availableRoomsFetch(roomType.room_type_id);
-    setModalVisible(true);
+    availableRoomsFetch(roomType.id,roomType.price);
+    setIsModalVisible(true);
   };
 
   const closeModal = () => {
-    setModalVisible(false);
+    setIsModalVisible(false);
   };
 
   const handleRoomSelect = (room) => {
     const selectedRoom = availableRooms.find((r) => r.room_number === room.room_number);
+     console.log(room,'selectedRoom2')
 
     if (!selectedRooms.some((r) => r.room_number === selectedRoom.room_number)) {
-      setSelectedRooms([...selectedRooms, selectedRoom]);
+     const currRoomType = roomTypes.filter((room) => room.id === selectedRoom.room_type_id)[0];
+    //  console.log(serviceCharge,'serviceCharge')
+
+      const roomDetails = {
+        type: selectedRoom.room_name,
+        count: 1,
+        roomType: currRoomType,
+        room: selectedRoom,
+        price: selectedRoom.price,
+      };
+      setSelectedRooms([...selectedRooms, roomDetails]);
     }
+
+    closeModal();
   };
 
   return (
@@ -251,7 +225,8 @@ const RoomDetails = ({ navigation }) => {
             isActive={item.isActive}
             onRoomSelected={handleRoomSelected}
             room={item}
-            onRoomTypePress={() => handleRoomTypePress(item)}
+            room_type_id={item.room_type_id}
+            onRoomTypePress={() => handleRoomTypePress(item,item.price)}
           />
         )}
         refreshControl={
@@ -265,15 +240,17 @@ const RoomDetails = ({ navigation }) => {
         onRequestClose={closeModal}
       >
         <View style={styles.modalContainer}>
+          
           <ScrollView>
-            {availableRooms.map((room) => (
+            {availableRooms.length>0?availableRooms.map((room) => (
               <View key={room.room_number}>
+                {/* {console.log(availableRooms,'availableRooms')} */}
                 <Text>Room Number: {room.room_number}</Text>
                 <TouchableOpacity onPress={() => handleRoomSelect(room)}>
                   <Text>Select</Text>
                 </TouchableOpacity>
               </View>
-            ))}
+            )):<Text>No Rooms Available</Text>}
           </ScrollView>
           <TouchableOpacity onPress={closeModal}>
             <Text>Close</Text>
@@ -282,7 +259,7 @@ const RoomDetails = ({ navigation }) => {
       </Modal>
       <TwoSectionBtn
         total={totalPrice}
-        count={totalCount}
+        count={selectedRooms.length}
         rooms={selectedRooms}
         link="Stay Details"
         navigation={navigation}
@@ -354,7 +331,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0186C1',
     elevation: 20,
     width: '35%',
-    borderRadius: 10, // Changed "borderCurve" to "borderRadius"
+    borderRadius: 10,
     padding: 10,
   },
   activeText: {

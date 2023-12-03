@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import { FontAwesome } from '@expo/vector-icons'; // Assuming you have FontAwesome installed
+import { firstLastCharater } from './SimpleCard';
 
 const RoomStatus = (checkInDatas) => {
   if (checkInDatas.room_booking_info.room_title === "Standard Room Testing") {
