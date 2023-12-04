@@ -1,30 +1,26 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import { FontAwesome } from '@expo/vector-icons'; // Assuming you have FontAwesome installed
-import { firstLastCharater } from './SimpleCard';
 
-const RoomStatus = (checkInDatas) => {
-  if (checkInDatas.room_booking_info.room_title === "Standard Room Testing") {
-    return "ST";
+export const firstLastCharater = (item) => {
+  if (item.includes(" ")) {
+    // If the item contains a space, return the first character of each word
+    const words = item?.split(" ");
+    return `${words[0].charAt(0)}${words[1].charAt(0)}${words[2].charAt(0)}`;
+  } else {
+    // If it's a single word, return the first two characters in uppercase
+    return item?.slice(0, 2).toUpperCase();
   }
-  else if (checkInDatas.room_booking_info.room_title === "Dulex Room") {
-    return "DR";
-  }
-  else if (checkInDatas.room_booking_info.room_title === "AC single room") {
-    return "ACSR";
-  }
-  else {
-    return "MULTI"
-  }
-}
+};
+
 const CheckOutCard = ({ checkInDatas }) => {
 // console.log()
+console.log(checkInDatas,"data")
   return (
     <View style={styles.container}>
       <View style={styles.roomType}>
         <Text>
-          {/* {RoomStatus(checkInDatas)} */}
-          ST
+          {firstLastCharater(checkInDatas?.hotel_name)}
         </Text>
       </View>
       <View>

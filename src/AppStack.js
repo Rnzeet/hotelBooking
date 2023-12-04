@@ -7,16 +7,15 @@ import CheckOutList from "./Screens/CheckOutList";
 import CreateBooking from "./Screens/Booking/CreateBooking";
 import NightAudit from "./Screens/NightAudit";
 import RoomAvailabilityScreen from "./Screens/HouseKeeping";
-import CancelledBookingScreen from "./Screens/CancelledBooking";
+import CancelledBookingNav from "./Screens/CancelledBooking/CancelledBookingNav";
+
 const Drawer = createDrawerNavigator();
 const AppStack = () => {
     return (
-        <Drawer.Navigator drawerContent={(props) => <CustomDrawer {...props} />}>
-            
+        <Drawer.Navigator drawerContent={(props) => <CustomDrawer {...props} />}>           
             <Drawer.Screen
             name="Dashboard" component={Main}
             >
-
             </Drawer.Screen>
             <Drawer.Screen
                 name="Check In List"
@@ -43,11 +42,12 @@ const AppStack = () => {
              />
                 <Drawer.Screen
                name="Cancelled Booking"
-               component={CancelledBookingScreen}
+               component={CancelledBookingNav}
+               options={{ headerShown: false }}
                 />
-
         </Drawer.Navigator>
     );
 };
+
 
 export default AppStack;

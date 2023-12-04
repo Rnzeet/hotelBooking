@@ -4,7 +4,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import RoomDetails from '../RoomDetails';
 import StayDetails from '../StayDetails';
-import SingleDetailsEdit from '../../components/SingleDetailsEdit';
 import CheckInFinal from '../CheckInFinal';
 
 const Stack = createStackNavigator();
