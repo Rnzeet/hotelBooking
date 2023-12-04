@@ -12,7 +12,7 @@ const BottomNavigation = () => {
   return (
     <Bottom.Navigator>
       <Bottom.Screen
-        name="DashBoard"
+        name="Home"
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color, size }) => (

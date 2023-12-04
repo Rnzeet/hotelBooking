@@ -66,7 +66,7 @@ useEffect(() => {
     fetchDataFromApi();
 }, []);
 const handleBackPress = () => {
-  navigation.navigate("Dashboard");
+  navigation.navigate("Home");
 };
 
   return (

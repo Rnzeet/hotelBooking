@@ -159,7 +159,22 @@ const HomeScreen = ({navigation}) => {
           Night Audit
         </Text>
       </TouchableOpacity>
-     
+      <TouchableOpacity style={styles.card}
+        onPress={()=> navigation.navigate('House Keeping')}
+      >
+        <FontAwesome5 name="bed" size={45} color="#0186C1" />
+        <Text style={styles.txt}>
+        House Keeping
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.card}
+        onPress={()=> navigation.navigate("Cancelled Booking")}
+      >
+        <FontAwesome5 name="window-close" size={45} color="#0186C1" />
+        <Text style={styles.txt}>
+        Cancelled Booking
+        </Text>
+      </TouchableOpacity>
 
     </ScrollView>
   )
