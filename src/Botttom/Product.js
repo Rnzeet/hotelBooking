@@ -26,7 +26,7 @@ const Product = () => {
   return (
     <View style={styles.container}>
       {userData && (
-        <Image source={{ uri: userData.logo_file }} style={styles.logo} />
+        <Image source={{ uri: userData?.logo_file }} style={styles.logo} />
       )}
 
       {userData ? (

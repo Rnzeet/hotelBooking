@@ -3,7 +3,9 @@
     "name": "RateBot AI PMS",
     "slug": "hotelogix",
     "extra": {
-  
+      "eas": {
+        "projectId": "a6c38507-cad0-4955-b22a-d557b20d137d"
+      }
     },
     "android": {
       "package": "com.easydigitals.hotelogix"

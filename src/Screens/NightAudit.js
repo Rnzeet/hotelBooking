@@ -106,6 +106,7 @@ const NightAudit = () => {
         hotelCode !== null ? fetchData() : getHotelCode();
     }, [hotelCode, selectedDate]);
 
+    console.log(apiData,"hiiiiiiiii")
     return (
         <View style={styles.container}
             refreshControl={

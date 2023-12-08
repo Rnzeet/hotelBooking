@@ -8,7 +8,7 @@ import CreateBooking from "./Screens/Booking/CreateBooking";
 import NightAudit from "./Screens/NightAudit";
 import RoomAvailabilityScreen from "./Screens/HouseKeeping";
 import CancelledBookingNav from "./Screens/CancelledBooking/CancelledBookingNav";
-import DashboardScreen from "./components/ChartScreen";
+import DashboardScreen from "./Screens/DashboardScreen";
 
 const Drawer = createDrawerNavigator();
 const AppStack = () => {
@@ -21,7 +21,7 @@ const AppStack = () => {
              <Drawer.Screen
                name="Dashboard"
                 component={DashboardScreen}
-               options={{ headerShown: false }}
+            //    options={{ headerShown: false }}
                 />
             <Drawer.Screen
                 name="Check In List"

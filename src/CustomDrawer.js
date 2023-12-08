@@ -47,7 +47,7 @@ const CustomDrawer = (props) => {
         // Convert the stored string back to an object (you can use JSON.parse)
         const userData = JSON.parse(userDataString);
 
-        setLogoPath(userData.logo_file)
+        setLogoPath(userData?.logo_file)
         setHotelName(userData.hotel_name)
         setHotelCode(userData.hotel_code)
         // console.log('User Data:', logoPath);

@@ -9,6 +9,7 @@ import {
   FlatList,
   Modal,
   ScrollView,
+  Image,
 } from "react-native";
 import DatePickerComp from "../components/DateTimePicker";
 import { FontAwesome } from "@expo/vector-icons";
@@ -285,9 +286,12 @@ const RoomDetails = ({ navigation }) => {
         onRequestClose={closeModal}
       >
         <View style={styles.modalContainer}>
-          <View style={{ position: "absolute", top: 0, right: 0, margin: 16 }}>
+          <View style={{ position: "absolute", top: 3, right: 3 }}>
             <TouchableOpacity onPress={closeModal}>
-              <FontAwesome5 name="window-close" size={40} color={"#0186C1"} />
+              <Image
+                source={require("../assets/Cancel.png")}
+                style={{ width: 35, height: 35 }}
+              />
             </TouchableOpacity>
           </View>
 
@@ -296,17 +300,21 @@ const RoomDetails = ({ navigation }) => {
               availableRooms.map((room) => (
                 <View key={room.room_number}>
                   {/* {console.log(availableRooms,'availableRooms')} */}
-                  <Text style={{fontSize:18,fontWeight:'normal'}}>Room Number: {room.room_number}</Text>
+                  <Text style={{ fontSize: 18, fontWeight: "normal" }}>
+                    Room Number: {room.room_number}
+                  </Text>
                   <View style={styles.button}>
-                  <TouchableOpacity onPress={() => handleRoomSelect(room)}>
-                    <Text  style={styles.buttonText}>Select</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity onPress={() => handleRoomSelect(room)}>
+                      <Text style={styles.buttonText}>Select</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               ))
             ) : (
-              <View style={{alignItems:'center',marginTop:"50%"}}>
-              <Text style={{fontSize:40,fontWeight:'400'}}>No Rooms Available</Text>
+              <View style={{ alignItems: "center", marginTop: "50%" }}>
+                <Text style={{ fontSize: 40, fontWeight: "400" }}>
+                  No Rooms Available
+                </Text>
               </View>
             )}
           </ScrollView>
@@ -396,19 +404,25 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     backgroundColor: "white",
-    padding:20,
+    padding: 20,
     elevation: 5,
     borderColor: "#0186C1", // Add this line for borderColor
     borderWidth: 1,
-    marginHorizontal:10,
-    marginVertical:10
+    marginHorizontal: 10,
+    marginVertical: 10,
   },
   buttonText: {
+    justifyContent:'center',
+    alignSelf:'center',
     fontSize: 18, // Adjust the font size as needed
-    fontWeight: 'bold', // Adjust the font weight as needed
+    fontWeight: "bold", // Adjust the font weight as needed
     // Add any additional styles for the Text component
   },
-  button:{
-    backgroundColor:'blue' ,padding:10,width:"30%",borderRadius:5,marginTop:10
-  }
+  button: {
+    backgroundColor: "blue",
+    padding: 10,
+    width: "30%",
+    borderRadius: 5,
+    marginTop: 10,
+  },
 });
