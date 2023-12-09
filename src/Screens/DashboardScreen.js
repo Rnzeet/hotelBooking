@@ -164,10 +164,7 @@ const DashboardScreen = () => {
             </View>
           </View>
         ) : (<View>
-               {errorRev ? 
-               <Text>Api Failed to Fetch Data</Text> :
-                 <Text>Loading...</Text>
-               }</View>)}
+              </View>)}
         {/* booked rooms stats */}
         {apiData?.length > 0 ? (
           <View style={styles.section}
@@ -191,10 +188,7 @@ const DashboardScreen = () => {
             ))}
           </View>
         ) :(<View>
-               {error ? 
-               <Text>Api Failed to Fetch Data</Text> :
-                 <Text>Loading...</Text>
-               }</View>)}
+              </View>)}
 
       </ScrollView>
     </View>
