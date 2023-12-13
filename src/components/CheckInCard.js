@@ -3,11 +3,29 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 import { firstLastCharater } from './SimpleCard';
-
+import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CheckInCard = ({ checkInDatas }) => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
+  const [hotelCode, setHotelCode] = useState('');
+  AsyncStorage.getItem('userData')
+  .then((userDataString) => {
+    if (userDataString) {
+      // Convert the stored string back to an object (you can use JSON.parse)
+      const userData = JSON.parse(userDataString);
 
+    
+      setHotelCode(userData.hotel_code)
+      // console.log('User Data:', logoPath);
+    } else {
+      console.log('User data not found.');
+    }
+  })
+  .catch((error) => {
+    console.error('Error retrieving user data:', error);
+  });
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
@@ -15,8 +33,12 @@ const CheckInCard = ({ checkInDatas }) => {
   const close = () => {
     setModalVisible(false);
   }
-
+const handleClick=()=>{
+  navigation.navigate("CheckInDetailsScreen" ,item={checkInDatas,hotelCode})
+}
+console.log(hotelCode,"hotellllllllll")
   return (
+    <TouchableOpacity onPress={handleClick}>
     <View style={styles.container}>
       <View style={styles.roomType}>
         <Text>{firstLastCharater(checkInDatas?.room_booking_info?.room_title)}</Text>
@@ -34,11 +56,11 @@ const CheckInCard = ({ checkInDatas }) => {
           <Text>{`R X ${checkInDatas.room_booking_info.no_of_rooms} G X ${checkInDatas.room_booking_info.no_of_adults + checkInDatas.room_booking_info.no_of_children}`}</Text>
         </View>
       </View>
-      <TouchableOpacity onPress={toggleModal} style={styles.verticle}>
+      {/* <TouchableOpacity onPress={toggleModal} style={styles.verticle}>
         <FontAwesome name="ellipsis-v" size={20} color="black" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
-      <Modal isVisible={isModalVisible}>
+      {/* <Modal isVisible={isModalVisible}>
         <View style={styles.modalContainer}>
           <TouchableOpacity onPress={() => {
             // Handle the Check-In action
@@ -71,8 +93,9 @@ const CheckInCard = ({ checkInDatas }) => {
             <Text style={styles.optionText}>Close</Text>
           </TouchableOpacity>
         </View>
-      </Modal>
+      </Modal> */}
     </View>
+    </TouchableOpacity>
   );
 };
 
@@ -80,7 +103,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 5
+    padding: 5,
+    paddingRight:15
   },
   roomType: {
     backgroundColor: '#FECD00',

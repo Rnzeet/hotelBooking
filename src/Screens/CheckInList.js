@@ -6,8 +6,10 @@ import { FontAwesome } from '@expo/vector-icons';
 import checkedInStatus from '../constants/constants';
 import CheckInCard from '../components/CheckInCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import NavigationHead from '../components/NavigationHead';
+import { useNavigation } from "@react-navigation/native";
 const CheckInList = () => {
+  const navigation = useNavigation();
   const [checkIns, setCheckIns] = useState([]);
   const [loading, setLoading] = useState(false);
   const currDate = new Date().toISOString().slice(0, 10);
@@ -66,10 +68,16 @@ const CheckInList = () => {
   }, [selectedDate]);
 
   const checked_ins = checkedInStatus(checkIns);
-  console.log(checkIns)
-
+  console.log(checkIns,"dataaaasa")
+  const handleBackPress = () => {
+    navigation.navigate("Home");
+  };
   return (
     <View style={styles.container}>
+       <NavigationHead
+      heading="Check In"
+      onBackPress={handleBackPress}
+    />
       <View style={styles.header}>
         <DatePickerComp
           selectedDate={selectedDate}
@@ -127,6 +135,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f7f7f7',
+    marginTop:30,
+    padding: 1,
   },
   header: {
     width: '100%',
