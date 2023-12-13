@@ -9,6 +9,7 @@ import RoomAvailabilityScreen from "./Screens/HouseKeeping";
 import CancelledBookingNav from "./Screens/CancelledBooking/CancelledBookingNav";
 import DashboardScreen from "./Screens/DashboardScreen";
 import CheckInNav from "./Screens/CheckIn/CheckInNav";
+import HelpScreen from "./Screens/Help";
 
 const Drawer = createDrawerNavigator();
 const AppStack = () => {
@@ -51,6 +52,10 @@ const AppStack = () => {
                component={CancelledBookingNav}
                options={{ headerShown: false }}
                 />
+                <Drawer.Screen
+                name="Help"
+                component={HelpScreen}
+            />
         </Drawer.Navigator>
     );
 };
