@@ -12,6 +12,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 const CheckInList = () => {
   const navigation = useNavigation();
   const [checkIns, setCheckIns] = useState([]);
+  const [status, setStatus] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
   const [hotelCode, setHotelCode] = useState('');
@@ -43,8 +44,11 @@ const CheckInList = () => {
 console.log(postData,"dataaa")
     try {
       const response = await axios.post(apiUrl, postData);
-      setCheckIns(response.data.data);
-      console.log(response.data.data);
+      const filteredCheckIns = response.data.data.filter(
+        (booking) => booking.booking_status ==='pending'
+      );
+      setCheckIns(filteredCheckIns);
+      setStatus(response.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -74,6 +78,12 @@ console.log(postData,"dataaa")
   const handleBackPress = () => {
     navigation.navigate('Home');
   };
+  const filteredCheckIns = status.filter(
+    (booking) => booking?.booking_status === 'check_in'
+  );
+  const filteredPending= status.filter(
+    (booking) => booking?.booking_status === 'pending'
+  );
 
   return (
     <View style={styles.container}>
@@ -98,17 +108,17 @@ console.log(postData,"dataaa")
         <View style={styles.check}>
           <View style={styles.count2}>
             <Text style={{ alignItems: 'center', fontWeight: 'bold', color: 'white', fontSize: 20 }}>
-              {checked_ins.checkedIn}
+              {filteredCheckIns?.length}
             </Text>
           </View>
           <Text style={{ alignItems: 'center', fontWeight: 'bold', fontSize: 17, marginTop: 12, color: 'white' }}>
-            CHECKED-IN
+            CHECK-IN
           </Text>
         </View>
         <View style={styles.check}>
           <View style={styles.count2}>
             <Text style={{ alignItems: 'center', fontWeight: 'bold', color: 'white', fontSize: 20 }}>
-              {checked_ins.pending}
+              {filteredPending?.length}
             </Text>
           </View>
           <Text style={{ alignItems: 'center', fontWeight: 'bold', fontSize: 17, marginTop: 12, color: 'white' }}>
@@ -116,6 +126,11 @@ console.log(postData,"dataaa")
           </Text>
         </View>
       </View>
+      { checkIns?.length===0 ?<View style={{marginTop:50,justifyContent:'center',alignItems:'center'}}>
+      <Text  style={{fontSize:20}}>
+            No data Available
+        </Text>
+      </View>:("")}
       <FlatList
         data={checkIns}
         keyExtractor={(item) => item.booking_id.toString()}

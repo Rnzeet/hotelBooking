@@ -7,14 +7,17 @@ import checkedInStatus, { checkedOutStatus } from '../constants/constants';
 import CheckInCard from '../components/CheckInCard';
 import CheckOutCard from '../components/CheckOutCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import NavigationHead from '../components/NavigationHead';
 
 const CheckOutList = () => {
   const [checkIns, setCheckIns] = useState([]);
+  const [status, setStatus] = useState([]);
   const [loading, setLoading] = useState(false);
   const currDate = new Date().toISOString().slice(0, 10);
   const [selectedDate, setSelectedDate] = useState(currDate);
   const [hotelCode, setHotelCode] = useState('');
-
+  const navigation = useNavigation();
   // Retrieve the data from AsyncStorage
   AsyncStorage.getItem('userData')
     .then((userDataString) => {
@@ -37,17 +40,21 @@ const CheckOutList = () => {
     setRefreshing(true);
     
 
-    const apiUrl = 'https://api.ratebotai.com:8443/get_check_out_orders';
+    const apiUrl ='https://api.ratebotai.com:8443/get_check_in_orders';
 
     const postData = {
       from_date: selectedDate,
-      to_date: currDate,
+      to_date: selectedDate,
       hotel_code: hotelCode,
     };
 
     try {
       const response = await axios.post(apiUrl, postData);
-      setCheckIns(response.data.data);
+      const filteredCheckIns = response?.data?.data?.filter(
+        (booking) => booking.booking_status === 'check_in' || booking.booking_status === 'check_out'
+      );
+      setCheckIns(filteredCheckIns);
+      setStatus(response.data.data);
     } catch (error) {
       alert('Error fetching room types:', error);
     }
@@ -56,7 +63,14 @@ const CheckOutList = () => {
   };
 
   const [refreshing, setRefreshing] = useState(false);
-
+  useFocusEffect(
+    React.useCallback(() => {
+      // Ensure that fetchData is called only after hotelCode is fetched
+      if (hotelCode) {
+        fetchData();
+      }
+    }, [selectedDate, hotelCode])
+  );
   const onRefresh = () => {
     fetchData();
   };
@@ -66,11 +80,23 @@ const CheckOutList = () => {
       fetchData();
     }
   }, [selectedDate]);
-
-  const checked_outs = checkedOutStatus(checkIns);
-
+  const filteredCheckIns = status.filter(
+    (booking) => booking.booking_status === 'check_in'
+  );
+  const filteredCheckOuts = status.filter(
+    (booking) => booking.booking_status === 'check_out'
+  );
+  const checked_outs = checkedOutStatus(status);
+  const handleBackPress = () => {
+    navigation.navigate('Home');
+  };
+   console.log(checkIns,"checkins")
   return (
     <View style={styles.container}>
+      <NavigationHead
+      heading="Check Out"
+      onBackPress={handleBackPress}  
+    />
       <View style={styles.header}>
         <DatePickerComp
           selectedDate={selectedDate}
@@ -88,7 +114,7 @@ const CheckOutList = () => {
         <View style={styles.check}>
           <View style={styles.count2}>
             <Text style={{ alignItems: 'center', fontWeight: 'bold', color: "white", fontSize: 20 }}>
-              {checked_outs?.checkedOut}
+              {filteredCheckOuts?.length}
             </Text>
           </View>
           <Text style={{ alignItems: 'center', fontWeight: 'bold', fontSize: 17, marginTop: 12, color: 'white' }}>
@@ -98,20 +124,25 @@ const CheckOutList = () => {
         <View style={styles.check}>
           <View style={styles.count2}>
             <Text style={{ alignItems: 'center', fontWeight: 'bold', color: "white", fontSize: 20 }}>
-              {checked_outs?.pending}
+              {filteredCheckIns?.length}
             </Text>
           </View>
           <Text style={{ alignItems: 'center', fontWeight: 'bold', fontSize: 17, marginTop: 12, color: 'white' }}>
-            PENDING
+            CHECK-IN
           </Text>
         </View>
       </View>
+      { checkIns?.length===0 ?<View style={{marginTop:50,justifyContent:'center',alignItems:'center'}}>
+      <Text  style={{fontSize:20}}>
+            No data Available
+        </Text>
+      </View>:("")}
       <FlatList
         data={checkIns}
         keyExtractor={(item, idx) => "COUT" + idx.toString() + item?.guest_id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.card}>
-            <CheckOutCard checkInDatas={item} />
+          <View style={[styles.card, { backgroundColor: item?.booking_status === 'check_out' ? '#FFDADA' : '#fff' }]}>
+            <CheckOutCard checkOutDatas={item} />
           </View>
         )}
         refreshControl={
@@ -128,6 +159,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f7f7f7',
+    marginTop:30,
+    padding: 1,
   },
   header: {
     width: '100%',

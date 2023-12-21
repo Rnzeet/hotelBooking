@@ -2,7 +2,6 @@ import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import CustomDrawer from "./CustomDrawer";
 import Main from "./Screens/Main";
-import CheckOutList from "./Screens/CheckOutList";
 import CreateBooking from "./Screens/Booking/CreateBooking";
 import NightAudit from "./Screens/NightAudit";
 import RoomAvailabilityScreen from "./Screens/HouseKeeping";
@@ -10,6 +9,7 @@ import CancelledBookingNav from "./Screens/CancelledBooking/CancelledBookingNav"
 import DashboardScreen from "./Screens/DashboardScreen";
 import CheckInNav from "./Screens/CheckIn/CheckInNav";
 import HelpScreen from "./Screens/Help";
+import CheckOutNav from "./Screens/CheckOut/CheckOutNav";
 
 const Drawer = createDrawerNavigator();
 const AppStack = () => {
@@ -31,8 +31,8 @@ const AppStack = () => {
             />
             <Drawer.Screen
                 name="Check Out List"
-                component={CheckOutList}
-                options={{ headerShown: true }}
+                component={CheckOutNav}
+                options={{ headerShown: false }}
             />
             <Drawer.Screen
                 name="Create Booking"

@@ -10,7 +10,7 @@ const TwoSectionBtn = ({ callCheckInAPI, total, count, link, navigation, rooms, 
   const togglePreferenceModal = () => {
     setIsVisible(!isVisible);
   };
-
+console.log(callCheckInAPI, total, count, link, navigation, rooms, details, dates ,"dataaa")
   const handleContinue = async () => {
     if (link !== '') {
       if (link === 'Single Edit') {

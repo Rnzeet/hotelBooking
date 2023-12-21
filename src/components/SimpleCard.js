@@ -3,17 +3,15 @@ import React from 'react'
 import { FontAwesome } from '@expo/vector-icons'; // Assuming you have FontAwesome installed
 
 export const firstLastCharater = (item) => {
-  if (item.includes(" ")) {
+  if (item?.includes(" ")) {
     // If the item contains a space, return the first character of each word
-    const words = item.split(" ");
-    return `${words[0].charAt(0)}${words[1].charAt(0)}`;
+    const words = item?.split(" ");
+    return `${words[0]?.charAt(0)}${words[1]?.charAt(0)}`;
   } else {
     // If it's a single word, return the first two characters in uppercase
-    return item.slice(0, 2).toUpperCase();
+    return item?.slice(0, 2)?.toUpperCase();
   }
 };
-
-
 
 const SimpleCard = ({ dates,item,details,id }) => {
 

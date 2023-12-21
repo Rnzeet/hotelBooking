@@ -1,54 +1,69 @@
-import { View, Text, StyleSheet } from 'react-native'
-import React from 'react'
+import { View, Text, StyleSheet,TouchableOpacity } from 'react-native'
+import React, { useState } from 'react';
 import { FontAwesome } from '@expo/vector-icons'; // Assuming you have FontAwesome installed
+import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { firstLastCharater } from './SimpleCard';
 
-export const firstLastCharater = (item) => {
-  if (item.includes(" ")) {
-    // If the item contains a space, return the first character of each word
-    const words = item?.split(" ");
-    return `${words[0].charAt(0)}${words[1].charAt(0)}${words[2].charAt(0)}`;
+
+const CheckOutCard = ({ checkOutDatas }) => {
+const navigation = useNavigation();
+const [hotelCode, setHotelCode] = useState('');
+AsyncStorage.getItem('userData')
+.then((userDataString) => {
+  if (userDataString) {
+    // Convert the stored string back to an object (you can use JSON.parse)
+    const userData = JSON.parse(userDataString);
+
+  
+    setHotelCode(userData.hotel_code)
+    // console.log('User Data:', logoPath);
   } else {
-    // If it's a single word, return the first two characters in uppercase
-    return item?.slice(0, 2).toUpperCase();
+    console.log('User data not found.');
   }
-};
-
-const CheckOutCard = ({ checkInDatas }) => {
-// console.log()
-console.log(checkInDatas,"data")
+})
+.catch((error) => {
+  console.error('Error retrieving user data:', error);
+});
+const handleClick=()=>{
+  navigation.navigate("CheckOutDetailsScreen" ,item={checkOutDatas,hotelCode})
+}
+console.log(checkOutDatas?.booking_status,"datas")
   return (
+    <TouchableOpacity onPress={handleClick}>
     <View style={styles.container}>
       <View style={styles.roomType}>
         <Text>
-          {firstLastCharater(checkInDatas?.hotel_name)}
+          {firstLastCharater(checkOutDatas?.hotel_name)}
         </Text>
       </View>
       <View>
         <Text>
-          {checkInDatas?.guest_first_name}
+          {checkOutDatas?.guest_first_name}
         </Text>
         <Text>
-          {`#${checkInDatas?.guest_id}`}
+          {`#${checkOutDatas?.guest_id}`}
         </Text>
         <Text>
-          {`${checkInDatas?.from_date} > ${checkInDatas?.to_date}`}
+          {`${checkOutDatas?.from_date} > ${checkOutDatas?.to_date}`}
         </Text>
       </View>
       <View >
         <View>
-          <Text>{`₹ ${checkInDatas?.total_sale_amount}`}
+          <Text>{`₹ ${checkOutDatas?.total_sale_amount}`}
           </Text>
         </View>
         <View>
           <Text>
-            {`N X ${checkInDatas?.no_of_nights} G X ${checkInDatas?.no_of_adults + checkInDatas?.no_of_children}`}
+            {`N X ${checkOutDatas?.no_of_nights} G X ${checkOutDatas?.no_of_adults + checkOutDatas?.no_of_children}`}
           </Text>
         </View>
       </View>
-      <View style={styles.verticle}>
+      {/* <View style={styles.verticle}>
         <FontAwesome name="ellipsis-v" size={20} color="black" />
-      </View>
-    </View >
+      </View> */}
+    </View>
+    </TouchableOpacity>
   )
 }
 
@@ -56,7 +71,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 5
+    padding: 5,
+    paddingRight:15,
   },
   roomType: {
     backgroundColor: '#FECD00',

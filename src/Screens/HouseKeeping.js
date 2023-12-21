@@ -2,11 +2,34 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList,  TextInput, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import Modal from 'react-native-modal'; // Import the modal library
+import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const RoomAvailabilityScreen = () => {
     const [roomData, setRoomData] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [hotelCode, setHotelCode] = useState('');
+
+
+    const fetchHotelCode = async () => {
+      try {
+        const userDataString = await AsyncStorage.getItem('userData');
+  
+        if (userDataString) {
+          const userData = JSON.parse(userDataString);
+          setHotelCode(userData.hotel_code);
+        } else {
+          console.log('User data not found.');
+        }
+      } catch (error) {
+        console.error('Error retrieving user data:', error);
+      }
+    };
+  
+    useEffect(() => {
+        fetchHotelCode();
+      }, []);
     const [editedData, setEditedData] = useState({
         room_id: null,
         house_keeping_ids: null,
@@ -38,7 +61,7 @@ const RoomAvailabilityScreen = () => {
    const fetchDataFromApi = async () => {
     try {
         const response = await axios.post('https://api.ratebotai.com:8443/get_house_keeping_list', {
-            hotel_code: 100087
+            hotel_code: hotelCode
         });
         setRoomData(response.data.data);
     } catch (error) {
@@ -86,6 +109,15 @@ const RoomAvailabilityScreen = () => {
         fetchData();
     }, []);
 
+    useFocusEffect(
+        React.useCallback(() => {
+          // Ensure that fetchData is called only after hotelCode is fetched
+          if (hotelCode) {
+            fetchDataFromApi();
+          }
+        }, [hotelCode])
+      );
+    
     const getAvailabilityColor = (status) => {
         switch (status) {
             case 'Available':

@@ -82,7 +82,7 @@ const HomeScreen = ({ navigation }) => {
     setTimeout(() => {
       setCurrTime(new Date().toLocaleTimeString());
       setSelectedDate(new Date().toISOString().slice(0, 10));
-      fetchData();
+      // fetchData();
       setRefreshing(false);
       if (hotelCode) {
         fetchData();
@@ -96,6 +96,15 @@ const HomeScreen = ({ navigation }) => {
       CommonActions.reset({
         index: 1,
         routes: [{ name: 'Home' }, { name: 'Check In List' }],
+      })
+    );
+  };
+  const navigateToCheckOutScreen = () => {
+    // Reset the navigation state to CheckInList screen
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 1,
+        routes: [{ name: 'Home' }, { name: 'Check Out List' }],
       })
     );
   };
@@ -118,14 +127,14 @@ const HomeScreen = ({ navigation }) => {
           <FontAwesome5 name='key' size={45} color="#0186C1" />
           <Text style={styles.count}>{checkIns}</Text>
         </View>
-        <Text style={styles.txt}>CHECKED IN</Text>
+        <Text style={styles.txt}>CHECK IN</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Check Out List')}>
+      <TouchableOpacity style={styles.card} onPress={navigateToCheckOutScreen}>
         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
           <FontAwesome5 name='door-open' size={45} color="#0186C1" />
           <Text style={styles.count}>{checkOuts}</Text>
         </View>
-        <Text style={styles.txt}>CHECKED OUT</Text>
+        <Text style={styles.txt}>CHECK OUT</Text>
       </TouchableOpacity>
       {/* Add other TouchableOpacity components as needed */}
       <TouchableOpacity style={styles.card}
