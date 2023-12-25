@@ -12,7 +12,12 @@ const TwoSectionBtn = ({ callCheckInAPI, total, count, link, navigation, rooms, 
   };
 console.log(callCheckInAPI, total, count, link, navigation, rooms, details, dates ,"dataaa")
   const handleContinue = async () => {
-    if (link !== '') {
+    if (total === 0) {
+      // Show an alert if total is 0
+      alert('Select an Hotel Room First');
+      return;
+    }
+    if (link !== '' && total !=0) {
       if (link === 'Single Edit') {
         try {
           const response = await callCheckInAPI();

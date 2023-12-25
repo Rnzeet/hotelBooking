@@ -764,6 +764,7 @@ console.log(roomTypes,"typess")
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        style={{marginBottom:50}}
       />
       <Modal
         animationType="slide"
@@ -807,7 +808,7 @@ console.log(roomTypes,"typess")
       </Modal>
       <TwoSectionBtn
         total={totalPrice}
-        count={selectedRooms.length}
+        count={totalPrice===0 ? 0 : selectedRooms.length}
         rooms={selectedRooms}
         link="Stay Details"
         navigation={navigation}

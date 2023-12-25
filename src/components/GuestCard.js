@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity ,Alert} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 import { firstLastCharater } from './SimpleCard';
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Avatar } from 'react-native-elements';
 
-const CheckInCard = ({ checkInDatas }) => {
+const GuestCard = ({ checkInDatas }) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
   const [hotelCode, setHotelCode] = useState('');
@@ -34,46 +35,50 @@ const CheckInCard = ({ checkInDatas }) => {
     setModalVisible(false);
   }
 const handleClick=()=>{
-  // alert("Check in only allowed for the day atfer the last audit day")
-  // navigation.navigate("CheckInDetailsScreen" ,item={checkInDatas,hotelCode})
-  Alert.alert(
-    'Check-in Alert',
-    'Check-in is only allowed for the day after the last audited day',
-    [
-      {
-        text: 'OK',
-        onPress: () => {
-          navigation.navigate('CheckInDetailsScreen', { checkInDatas, hotelCode });
-        },
-      },
-    ],
-    { cancelable: false }
-  );
+//   navigation.navigate("CheckInDetailsScreen" ,item={checkInDatas,hotelCode})
 }
-console.log(hotelCode,"hotellllllllll")
+console.log(checkInDatas,"hotellllllllll")
   return (
     <TouchableOpacity onPress={handleClick}>
     <View style={styles.container}>
       <View style={styles.roomType}>
-        <Text>{firstLastCharater(checkInDatas?.room_booking_info?.room_title)}</Text>
+        {/* <Text>{firstLastCharater(checkInDatas?.room_booking_info?.room_title)}</Text> */}
+        {/* {checkInDatas?.guest_data?.gender === 'Male' ? (
+            <Avatar
+              rounded
+              size="medium"
+              icon={{ name: 'user', type: 'font-awesome', color: 'white' }}
+              containerStyle={{ backgroundColor: 'blue' }}
+            />
+          ) : (
+            <Avatar
+              rounded
+              size="medium"
+              icon={{ name: 'user', type: 'font-awesome', color: 'white' }}
+              containerStyle={{ backgroundColor: 'pink' }}
+            />
+          )} */}
+          {checkInDatas?.guest_data?.gender === 'Male' ? (
+          <FontAwesome name="male" size={40} color="blue" />
+        ) : (
+          <FontAwesome name="female" size={40} color="pink" />
+        )}
       </View>
       <View>
-        <Text>{checkInDatas.guest_first_name}</Text>
-        <Text>{`#${checkInDatas.booking_id}`}</Text>
-        <Text>{`${checkInDatas.from_date} > ${checkInDatas.to_date}`}</Text>
+        <Text >{checkInDatas?.guest_data?.first_name} {checkInDatas?.guest_data?.last_name}</Text>
+        <Text >{`${checkInDatas.from_date} > ${checkInDatas.to_date}`}</Text>
+        <Text>{`${checkInDatas?.guest_data?.phone_number}`}</Text>
+        <Text>{`${checkInDatas?.guest_data?.email}`}</Text>
       </View>
       <View>
         <View>
-          <Text>{`₹ ${checkInDatas.total_sale_amount}`}</Text>
-        </View>
-        <View>
-          <Text>{`R X ${checkInDatas.room_booking_info.no_of_rooms} G X ${checkInDatas.room_booking_info.no_of_adults + checkInDatas.room_booking_info.no_of_children}`}</Text>
+          {/* <Text>{`R X ${checkInDatas.room_booking[0].no_of_rooms} G X ${checkInDatas.room_booking[0].no_of_adults + checkInDatas.room_booking_info.no_of_children}`}</Text> */}
         </View>
       </View>
       {/* <TouchableOpacity onPress={toggleModal} style={styles.verticle}>
         <FontAwesome name="ellipsis-v" size={20} color="black" />
       </TouchableOpacity> */}
-
+     
       {/* <Modal isVisible={isModalVisible}>
         <View style={styles.modalContainer}>
           <TouchableOpacity onPress={() => {
@@ -117,20 +122,26 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 5,
-    paddingRight:15
+    padding: 15,
+    paddingRight:15,
+    backgroundColor:"#f0f8ff",
+    marginTop:10,
+    borderRadius:10,
+    marginHorizontal:10
   },
+//   FFF5EE
   roomType: {
-    backgroundColor: '#FECD00',
+    marginVertical:3,
+    backgroundColor: 'white',
     color: '#fff',
-    borderRadius: 50,
+    borderRadius: 10,
     padding: 5,
-    width: 60,
-    height: 60,
+    width:"23%",
+    // height:"80%",
     alignItems: 'center',
     justifyContent: 'center',
     textAlign: 'center',
-    marginRight: 10,
+    marginRight:-20,
     borderRightWidth: 2,
     borderRightColor: 'white'
   },
@@ -182,4 +193,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CheckInCard;
+export default GuestCard;

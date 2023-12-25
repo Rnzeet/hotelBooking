@@ -13,8 +13,6 @@ const GuestDetails = ({ rooms, total, onPersonDetailsChange, onSelectedServicesC
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [newBorderColor, setNewBorderColor] = useState('red');
-
-
   const add = (current) => {
     if (current === 'child') {
       if (child < 5) {
@@ -50,10 +48,9 @@ const GuestDetails = ({ rooms, total, onPersonDetailsChange, onSelectedServicesC
 
   const handleSelectService = (service) => {
     const isServiceSelected = selectedServices.length > 0 && selectedServices.find((s) => s.id === service.id);
-
     if (isServiceSelected) {
       const updatedServices = selectedServices.filter((s) => s.id !== service.id);
-      updateSelectedServices(updatedServices);
+      updateSelectedServices([...updatedServices, service]);
     } else {
       updateSelectedServices([...selectedServices, service]);
     }
@@ -100,7 +97,7 @@ useEffect(() => {
   bColor()
 }
 , [firstName, lastName, email, phone])
-
+console.log( rooms, total, onPersonDetailsChange, onSelectedServicesChange, checkInDate, checkOutDate,"huiii")
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>

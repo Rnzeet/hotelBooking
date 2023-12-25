@@ -18,6 +18,7 @@ import CheckInCard from "../components/CheckInCard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NavigationHead from "../components/NavigationHead";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import GuestCard from "../components/GuestCard";
 
 const CheckInDetailsScreen = (items) => {
   const currDate = new Date().toISOString().slice(0, 10);
@@ -121,7 +122,7 @@ const CheckInDetailsScreen = (items) => {
         ],
         { cancelable: false }
       );
-    } 
+    }
   }, [checkIns]);
 
   const handleCheckIn = () => {
@@ -170,8 +171,10 @@ const CheckInDetailsScreen = (items) => {
       }
     }, [hotelCode])
   );
-
-  console.log(data, lastDate, "checkin");
+const handleAddGuest=()=>{
+  alert("Screen needs to be developed by contacting backend")
+}
+  console.log(data, bookingData, checkIns, "checkin");
   // const handleModify = () => {
   //   alert("hiiiiii33333");
   // };
@@ -181,39 +184,59 @@ const CheckInDetailsScreen = (items) => {
     nextDay.setDate(nextDay.getDate() + 1);
     return date1 === nextDay.toISOString().slice(0, 10);
   };
+  console.log(data, bookingData, "datatatatat");
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
+        <Text
+          style={{
+            marginTop: 10,
+            marginBottom: 5,
+            marginLeft: 10,
+            fontWeight: "600",
+          }}
+        >
+          ROOM(S)
+        </Text>
         <View style={styles.card}>
           <CheckInCard checkInDatas={data} />
         </View>
         <View style={styles.card}>
-          <Text style={{ marginTop: 10, marginBottom: 5 }}>
+          <Text style={{ marginTop: 10, marginBottom: 5, fontWeight: "600" }}>
             GUEST INFORMATION
           </Text>
           <View style={styles.line}></View>
-          <Text style={{ marginTop: 10 }}>
-            {data?.guest_first_name} {data?.last_name}
-          </Text>
-          <Text style={{ marginTop: 5 }}>{data?.email}</Text>
-          <Text style={{ marginTop: 5 }}>{data?.mobile_number}</Text>
-          <Text style={{ marginTop: 10 }}>{data?.country}</Text>
-
-          <Text style={{ marginTop: 10 }}>
-            {data?.hotel_name} ({data?.room_booking_info?.room_title})
-          </Text>
-          <Text style={{ marginTop: 5 }}>
-            No of Adults : {data?.no_of_adults}
-          </Text>
-          <Text style={{ marginTop: 5 }}>
-            No of Children : {data?.no_of_children}
-          </Text>
-          <Text style={{ marginTop: 5 }}>
-            No of Rooms : {data?.room_booking_info?.no_of_rooms}
-          </Text>
+          <GuestCard checkInDatas={bookingData} />
+          {bookingData?.other_members?.length > 0 && (
+            <GuestCard checkInDatas={bookingData?.other_members} />
+          )}
         </View>
+        {data?.from_date && lastDate && isNextDay(data.from_date, lastDate) ? (
+          <TouchableOpacity onPress={handleAddGuest}>
+            <View style={styles.containerGuest}>
+              <FontAwesome name="plus" size={20} color="black" />
+              <Text style={styles.buttonTextGuest}>Add Guest</Text>
+            </View>
+          </TouchableOpacity>):(null)}
+
         <View style={styles.card}>
-          <View style={styles.balanceAmount}>
+          <View style={styles.balanceAmountpaid}>
+            <Text>Room Charge</Text>
+            <Text>{bookingData?.charge_till_now?.room_charges}</Text>
+          </View>
+          <View style={styles.balanceAmountpaid}>
+            <Text>Discount Amount</Text>
+            <Text>- {bookingData?.charge_till_now?.discount_amount}</Text>
+          </View>
+          <View style={styles.balanceAmountpaid}>
+            <Text>Other Charge</Text>
+            <Text>{bookingData?.charge_till_now?.other_charges}</Text>
+          </View>
+          <View style={styles.balanceAmountpaid}>
+            <Text>Room Tax</Text>
+            <Text>{bookingData?.charge_till_now?.room_tax_till_now}</Text>
+          </View>
+          <View style={styles.balanceAmountcharge}>
             <Text>Total Paid</Text>
             <Text>{data?.paid_amount}</Text>
           </View>
@@ -224,21 +247,22 @@ const CheckInDetailsScreen = (items) => {
           </View>
         </View>
         {data?.from_date && lastDate && isNextDay(data.from_date, lastDate) ? (
-        <View style={styles.bottomButtonsContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => handleCheckIn()}
-          >
-            <Text style={styles.buttonText}>Check In</Text>
-          </TouchableOpacity>
+          <View style={styles.bottomButtonsContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleCheckIn()}
+            >
+              <Text style={styles.buttonText}>Check In</Text>
+            </TouchableOpacity>
 
-          {/* <TouchableOpacity
+            {/* <TouchableOpacity
             style={styles.button}
             onPress={() => handleModify()}
           >
             <Text style={styles.buttonText}>Modify</Text>
           </TouchableOpacity> */}
-        </View>):(null)}
+          </View>
+        ) : null}
       </View>
     </ScrollView>
   );
@@ -259,10 +283,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     elevation: 2,
   },
+  balanceAmountcharge: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 5,
+    paddingHorizontal: 10,
+  },
   balanceAmount: {
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 15,
+    paddingHorizontal: 10,
+  },
+  balanceAmountpaid: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    // padding: 15,
     paddingHorizontal: 10,
   },
   line: {
@@ -289,5 +325,22 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     textAlign: "center",
+  },
+  containerGuest: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white', // Set your desired background color
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: 'center',
+    marginHorizontal:"20%",
+    marginVertical:0,
+    marginBottom:10,
+  },
+  buttonTextGuest: {
+    marginLeft: 5,
+    color: 'black', // Set your desired text color
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

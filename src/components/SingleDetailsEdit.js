@@ -142,11 +142,11 @@ const SingleDetailsEdit = ({ navigation, rooms,total,count,details,dates ,update
           <Text style={{ color: '#FECD00', fontSize: 26, fontWeight: 800 }}>
           ₹ {total - totalPaid}
           </Text>
-          <TouchableOpacity onPress={togglePaymentModal}>
+          {/* <TouchableOpacity onPress={togglePaymentModal}>
             <Text style={styles.btn}>
               Pay Now
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
 

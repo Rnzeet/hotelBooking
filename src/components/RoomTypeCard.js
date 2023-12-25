@@ -138,35 +138,37 @@ const RoomTypeCard = (props) => {
 
   const handleCardPress = () => {
     props.onRoomTypePress(props.price);
-    if (remainingRoom > 0) {
-      const newSelectedRooms = props.selectRoom.length > 0 ? 1 : 0;
-      // setRemainingRoom(remainingRoom - newSelectedRooms);
-      const newPrice = newSelectedRooms * props.price;
+    // if (remainingRoom > 0) {
+    //   const newSelectedRooms = props.selectRoom.length > 0 ? 1 : 0;
+    //   // setRemainingRoom(remainingRoom - newSelectedRooms);
+    //   const newPrice = newSelectedRooms * props.price;
+    //   props.onRoomSelected({
+    //     type: props.roomType,
+    //     count: newSelectedRooms,
+    //     price: newPrice,
+    //     room: props.room,
+    //     room_type_id: props.room_type_id,
+    //   });
+    // }
+  };
+  const handleMinusPress = () => {
+    if (props.selectRoom.length > 0) {
+      // setRemainingRoom(remainingRoom + 1);
       props.onRoomSelected({
         type: props.roomType,
-        count: newSelectedRooms,
-        price: newPrice,
+        count: 0,
+        price: 0,
         room: props.room,
         room_type_id: props.room_type_id,
       });
     }
-  };
-  // const handleMinusPress = () => {
-  //   if (props.selectRoom.length > 0) {
-  //     // setRemainingRoom(remainingRoom + 1);
-  //     props.onRoomSelected({
-  //       type: props.roomType,
-  //       count: 0,
-  //       price: 0,
-  //       room: props.room,
-  //       room_type_id: props.room_type_id,
-  //     });
-  //   }
-  // };
-
+  }; 
+ 
+   console.log(props.selectRoom.length > 0 && props?.selectRoom[0]?.roomType?.room_type_name === props?.roomType,"hiiiiii")
+   console.log(props.selectRoom[0]?.price , props?.selectRoom[0]?.roomType?.room_type_name === props?.roomType,"hiiiiii")
   return (
     <TouchableOpacity onPress={handleCardPress}  style={styles.container}>
-      <View style={[styles.card, props?.selectRoom?.length > 0 && props?.selectRoom[0]?.roomType?.room_type_name === props?.roomType && styles.selectedCard]}>
+      <View style={styles.card}>
         <View style={styles.count}>
           <Text style={styles.countText}>{`${props.selectRoom.length}/${remainingRoom}`}</Text>
         </View>
@@ -177,11 +179,11 @@ const RoomTypeCard = (props) => {
           </Text>
         </View>
         <Text>${props.price}</Text>
-        {/* {props.selectRoom.length > 0 && props?.selectRoom[0]?.roomType?.room_type_name === props?.roomType && ( // Show minus button when at least one room is selected
+        {(props.selectRoom.length > 0 && props?.selectRoom[0]?.roomType?.room_type_name === props?.roomType && props.selectRoom[0]?.price) ? ( // Show minus button when at least one room is selected
           <TouchableOpacity onPress={handleMinusPress} style={styles.minusButton}>
             <Text style={styles.minusButtonText}>-</Text>
           </TouchableOpacity>
-        )} */}
+        ):(null)}
       </View>
     </TouchableOpacity>
   );

@@ -17,6 +17,7 @@ const StayDetails = ({ navigation, route }) => {
   const [taxAmounts, setTaxAmounts] = useState(0);
   const [serviceCharge, setServiceCharge] = useState(0);
   const [taxType, setTaxType] = useState([]);
+  const [addOnsPrice, setAddOnsPrice] = useState();
   const [personDetails, setPersonDetails] = useState({
     firstName: '',
     lastName: '',
@@ -185,9 +186,16 @@ const StayDetails = ({ navigation, route }) => {
     useEffect(() => {
       setRoomTypeIdsFunc();
     }, [rooms]);
-    console.log(roomTypeIds,roomIds,"roomTypeIds,roomIds")
- 
 
+useEffect(() => {
+  if (selectedServices[0]?.length>0) {
+  const totalPrice = selectedServices[0]?.reduce((total, service) => total + service?.price, 0);
+  setAddOnsPrice(totalPrice )}
+  else {
+    setAddOnsPrice(0); // Set totalPrice to 0 when selectedServices is empty
+  }
+}, [selectedServices]);
+console.log(addOnsPrice,"adddd")
   return (
     <View style={styles.container}>
       {/* Uncomment the following line if you have a NavigationHead component */}
@@ -205,10 +213,10 @@ const StayDetails = ({ navigation, route }) => {
         />
       </ScrollView>
 
-      <View style={{ marginTop: 125 }}>
+      <View >
         {isDetailsComplete ? (
           <TwoSectionBtn
-            total={total}
+            total={total+addOnsPrice}
             count={count}
             link="Single Edit"
             navigation={navigation}
@@ -245,7 +253,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
-    marginTop: 20,
   },
   buttonText: {
     color: 'white',
