@@ -42,22 +42,6 @@ console.log(checkInDatas,"hotellllllllll")
     <TouchableOpacity onPress={handleClick}>
     <View style={styles.container}>
       <View style={styles.roomType}>
-        {/* <Text>{firstLastCharater(checkInDatas?.room_booking_info?.room_title)}</Text> */}
-        {/* {checkInDatas?.guest_data?.gender === 'Male' ? (
-            <Avatar
-              rounded
-              size="medium"
-              icon={{ name: 'user', type: 'font-awesome', color: 'white' }}
-              containerStyle={{ backgroundColor: 'blue' }}
-            />
-          ) : (
-            <Avatar
-              rounded
-              size="medium"
-              icon={{ name: 'user', type: 'font-awesome', color: 'white' }}
-              containerStyle={{ backgroundColor: 'pink' }}
-            />
-          )} */}
           {checkInDatas?.guest_data?.gender === 'Male' ? (
           <FontAwesome name="male" size={40} color="blue" />
         ) : (
@@ -66,7 +50,7 @@ console.log(checkInDatas,"hotellllllllll")
       </View>
       <View>
         <Text >{checkInDatas?.guest_data?.first_name} {checkInDatas?.guest_data?.last_name}</Text>
-        <Text >{`${checkInDatas.from_date} > ${checkInDatas.to_date}`}</Text>
+        <Text >{`${checkInDatas?.from_date} > ${checkInDatas?.to_date}`}</Text>
         <Text>{`${checkInDatas?.guest_data?.phone_number}`}</Text>
         <Text>{`${checkInDatas?.guest_data?.email}`}</Text>
       </View>

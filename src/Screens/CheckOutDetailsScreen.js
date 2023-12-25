@@ -21,6 +21,8 @@ import NavigationHead from "../components/NavigationHead";
 import { useNavigation } from "@react-navigation/native";
 import CheckOutCard from "../components/CheckOutCard";
 import * as FileSystem from 'expo-file-system';
+import GuestCard from "../components/GuestCard";
+import OtherGuestCard from "../components/OtherGuestCard";
 
 
 const CheckOutDetailsScreen = (items) => {
@@ -224,37 +226,30 @@ const CheckOutDetailsScreen = (items) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
+      <Text
+          style={{
+            marginTop: 10,
+            marginBottom: 5,
+            marginLeft: 10,
+            fontWeight: "600",
+          }}
+        >
+          ROOM(S)
+        </Text>
         <View style={styles.card}>
           <CheckOutCard checkOutDatas={data} />
         </View>
         <View style={styles.card}>
-          <Text style={{ marginTop: 10, marginBottom: 5 }}>
+          <Text style={{ marginTop: 10, marginBottom: 5, fontWeight: "600" }}>
             GUEST INFORMATION
           </Text>
           <View style={styles.line}></View>
-          <Text style={{ marginTop: 10 }}>
-            {data?.guest_first_name} {data?.last_name}
-          </Text>
-          <Text style={{ marginTop: 5 }}>{data?.email}</Text>
-          <Text style={{ marginTop: 5 }}>{data?.mobile_number}</Text>
-          <Text style={{ marginTop: 10 }}>{data?.country}</Text>
-
-          <Text style={{ marginTop: 10 }}>
-            {data?.hotel_name} ({data?.room_booking_info?.room_title})
-          </Text>
-          <Text style={{ marginTop: 5 }}>
-            Booking Status : {bookingData?.booking_status}
-          </Text>
-          <Text style={{ marginTop: 5 }}>
-            No of Adults : {data?.no_of_adults}
-          </Text>
-          <Text style={{ marginTop: 5 }}>
-            No of Children : {data?.no_of_children}
-          </Text>
-          <Text style={{ marginTop: 5 }}>
-            No of Rooms : {data?.room_booking_info?.no_of_rooms}
-          </Text>
+          <GuestCard checkInDatas={bookingData} />
+          {bookingData?.other_members?.length > 0 && (
+            <OtherGuestCard checkInDatas={bookingData} />
+          )}
         </View>
+       
         <View style={styles.card}>
           <View style={styles.balanceAmountpaid}>
             <Text>Room Charge</Text>

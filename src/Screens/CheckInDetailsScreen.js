@@ -9,6 +9,7 @@ import {
   RefreshControl,
   ScrollView,
   Alert,
+  TextInput,
 } from "react-native";
 import axios from "axios";
 import DatePickerComp from "../components/DateTimePicker";
@@ -19,11 +20,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import NavigationHead from "../components/NavigationHead";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import GuestCard from "../components/GuestCard";
+import Modal from "react-native-modal";
+import OtherGuestCard from "../components/OtherGuestCard";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
+import DropDownPicker from "react-native-dropdown-picker";
 
 const CheckInDetailsScreen = (items) => {
   const currDate = new Date().toISOString().slice(0, 10);
   const navigation = useNavigation();
-  const [selectedDate, setSelectedDate] = useState(currDate);
+  // const [selectedDate, setSelectedDate] = useState(currDate);
+  const [isModalVisible, setModalVisible] = useState(false);
   const [checkIns, setCheckIns] = useState([]);
   const [bookingData, setBookingData] = useState([]);
   const [lastDate, setLastDate] = useState();
@@ -171,10 +178,72 @@ const CheckInDetailsScreen = (items) => {
       }
     }, [hotelCode])
   );
-const handleAddGuest=()=>{
-  alert("Screen needs to be developed by contacting backend")
-}
-  console.log(data, bookingData, checkIns, "checkin");
+
+  // const [name, setName] = useState("");
+  // const [age, setAge] = useState("");
+  // const [gender, setGender] = useState("");
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
+  const close = () => {
+    setModalVisible(false);
+    setFormData("");
+  };
+
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("Male");
+  const [item, setItems] = useState([
+    { label: "Male", value: "Male" },
+    { label: "Female", value: "Female" },
+  ]);
+
+  const [formData, setFormData] = useState({
+    address: "",
+    booked_guest_id: bookingData?.customer_id,
+    date_of_birth: "",
+    extra_guest_id: "",
+    first_name: "",
+    id_number: "",
+    id_type: "",
+    last_name: "",
+    phone_number: "",
+    gender: "",
+  });
+  const handleInputChange = (key, value) => {
+    setFormData({
+      ...formData,
+      [key]: value,
+    });
+  };
+  const handleSave = () => {
+    const updatedPaymentList = bookingData?.other_members.concat({
+      first_name: formData.first_name,
+      gender: value,
+      address: formData.address,
+      booked_guest_id: 1166,
+      date_of_birth: formData.date_of_birth,
+      extra_guest_id: formData.extra_guest_id,
+      id_number: formData.id_number,
+      id_type: formData.id_type,
+      last_name: formData.last_name,
+      phone_number: formData.phone_number,
+    });
+
+    // Update bookingData with the new payment list
+    setBookingData({
+      ...bookingData,
+      other_members: updatedPaymentList,
+    });
+
+    toggleModal(); // Close the modal
+  };
+
+  const handleAddGuest = () => {
+    setModalVisible(true);
+  };
+
   // const handleModify = () => {
   //   alert("hiiiiii33333");
   // };
@@ -184,7 +253,30 @@ const handleAddGuest=()=>{
     nextDay.setDate(nextDay.getDate() + 1);
     return date1 === nextDay.toISOString().slice(0, 10);
   };
-  console.log(data, bookingData, "datatatatat");
+
+  console.log(
+    bookingData.other_members,
+
+    "datatatatat"
+  );
+
+
+  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const toggleDatePicker = () => {
+    setDatePickerVisible(!isDatePickerVisible);
+  };
+
+  // Function to handle date change in date picker
+  const handleDateChange = (event, selectedDate) => {
+    if (selectedDate) {
+      setSelectedDate(selectedDate);
+      handleInputChange("date_of_birth", selectedDate.toISOString().slice(0, 10));
+    }
+    toggleDatePicker(); // Close the date picker
+  };
+  console.log(selectedDate,formData.date_of_birth,"dateee")
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -208,16 +300,156 @@ const handleAddGuest=()=>{
           <View style={styles.line}></View>
           <GuestCard checkInDatas={bookingData} />
           {bookingData?.other_members?.length > 0 && (
-            <GuestCard checkInDatas={bookingData?.other_members} />
+            <OtherGuestCard checkInDatas={bookingData} />
           )}
         </View>
+
+        <TouchableOpacity onPress={handleAddGuest}>
+          <View style={styles.containerGuest}>
+            <FontAwesome name="plus" size={20} color="black" />
+            <Text style={styles.buttonTextGuest}>Add Guest</Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* ================================================================================================== */}
         {data?.from_date && lastDate && isNextDay(data.from_date, lastDate) ? (
-          <TouchableOpacity onPress={handleAddGuest}>
+        <TouchableOpacity onPress={handleAddGuest}>
             <View style={styles.containerGuest}>
               <FontAwesome name="plus" size={20} color="black" />
               <Text style={styles.buttonTextGuest}>Add Guest</Text>
             </View>
-          </TouchableOpacity>):(null)}
+          </TouchableOpacity>
+        ) : (
+        <TouchableOpacity
+            onPress={() =>
+              Alert.alert("Alert", "Adding guest is not permitted as check in is not allowed")
+            }
+          >
+        <View
+              style={[
+                styles.containerGuest,
+                { backgroundColor: "gray" },
+              ]}
+            >
+        <FontAwesome name="plus" size={20} color="white" />
+        <Text style={[styles.buttonTextGuest, { color: "white" }]}>
+                Add Guest
+              </Text>
+        </View>
+        </TouchableOpacity>
+        )}
+        {/* =================================================================================== */}
+
+        <Modal isVisible={isModalVisible}>
+          <View style={styles.modalContainer}>
+            <Text style={{ fontSize: 18, marginBottom: 10 }}>
+              Guest Information
+            </Text>
+
+            <TextInput
+              style={styles.input}
+              placeholder="First Name"
+              value={formData.first_name}
+              onChangeText={(text) => handleInputChange("first_name", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Last Name"
+              value={formData.last_name}
+              onChangeText={(text) => handleInputChange("last_name", text)}
+            />
+            <TouchableOpacity  style={styles.datePickerContainer} onPress={toggleDatePicker}>
+        <TextInput
+          style={styles.input}
+          placeholder="Date Of Birth"
+          caretHidden={true}
+          value={formData.date_of_birth || ""}
+          onTouchStart={toggleDatePicker}
+        />
+        <FontAwesome name="calendar" size={20} color="gray" style={styles.calendarIcon} />
+      </TouchableOpacity>
+      {isDatePickerVisible && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={selectedDate}
+          mode="date"
+          is24Hour={true}
+          display="default"
+          onChange={handleDateChange}
+        />
+      )}
+
+
+            <TextInput
+              style={styles.input}
+              keyboardType="number-pad"
+              placeholder="Phone no."
+              value={formData.phone_number}
+              onChangeText={(text) => handleInputChange("phone_number", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Address"
+              value={formData.address}
+              onChangeText={(text) => handleInputChange("address", text)}
+            />
+            <DropDownPicker
+              open={open}
+              value={value}
+              items={item}
+              setOpen={setOpen}
+              setValue={setValue}
+              setItems={setItems}
+              placeholder="Select Gender"
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Id Type"
+              value={formData.id_type}
+              onChangeText={(text) => handleInputChange("id_type", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Id no."
+              value={formData.id_number}
+              onChangeText={(text) => handleInputChange("id_number", text)}
+            />
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-around" }}
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  // Close the modal without saving
+                  close();
+                }}
+                style={{
+                  flex: 1,
+                  backgroundColor: "red",
+                  padding: 5,
+                  borderRadius: 20,
+                }}
+              >
+                <Text style={[styles.optionText, { textAlign: "center" }]}>
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleSave}
+                style={{
+                  flex: 1,
+                  backgroundColor: "yellow",
+                  padding: 5,
+                  borderRadius: 20,
+                }}
+              >
+                <Text style={[styles.optionText, { textAlign: "center" }]}>
+                  Save
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         <View style={styles.card}>
           <View style={styles.balanceAmountpaid}>
@@ -275,6 +507,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f7f7f7",
   },
+  picker: {
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 5,
+  },
   card: {
     backgroundColor: "#fff",
     padding: 10,
@@ -327,20 +564,60 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   containerGuest: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white', // Set your desired background color
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "white", // Set your desired background color
     padding: 10,
     borderRadius: 5,
-    justifyContent: 'center',
-    marginHorizontal:"20%",
-    marginVertical:0,
-    marginBottom:10,
+    justifyContent: "center",
+    marginHorizontal: "20%",
+    marginVertical: 0,
+    marginBottom: 10,
   },
   buttonTextGuest: {
     marginLeft: 5,
-    color: 'black', // Set your desired text color
+    color: "black", // Set your desired text color
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+  },
+  modalContainer: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+  },
+  optionText: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  input: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    marginVertical: 3,
+  },
+  pickerContainer: {
+    height: 40, // Adjust as needed
+    width: 200, // Adjust as needed
+  },
+  picker: {
+    backgroundColor: "red", // Try removing or modifying this
+  },
+  labelStyle: {
+    color: "red", // Add your text color
+    fontSize: 16, // Add your font size
+  },
+  datePickerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
 });
