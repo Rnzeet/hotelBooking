@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -74,6 +74,7 @@ const DateSlider = () => {
             bookingStatus: booking.booking_status,
             roomTitle: booking?.room_booking_info?.room_title,
             roomId: booking?.room_booking_info?.room_id,
+            guestId:booking?.guest_id,
           });
 
           startDate.setDate(startDate.getDate() + 1);
@@ -172,8 +173,23 @@ const DateSlider = () => {
     }
     return nextDates;
   };
+  const onCardNav = useCallback(
+    (guest_id) => {
+      const checkInDatas = checkIns.find((booking) =>
+        booking?.guest_id === guest_id
+      );
+console.log(checkInDatas,"dtats")
+      if (checkInDatas && checkInDatas?.booking_status==="pending") {
+        navigation.navigate('CheckInDetailsScreen', { checkInDatas,hotelCode });
+      }
+    else  if (checkInDatas && checkInDatas?.booking_status==="check_in") {
+      navigation.navigate("CheckOutDetailsScreen" ,item={checkOutDatas:checkInDatas,hotelCode})
+      }
+    },
+    [checkIns, hotelCode, navigation]
+  );
 
-  console.log(items, checkIns, formatDateSelect(selectedDate), "gatteee");
+  console.log(items,checkIns, "gatteee");
   return (
     <View
       style={{ flex: 1 }}
@@ -222,90 +238,6 @@ const DateSlider = () => {
       </View>
       <ScrollView style={{ flex: 1 }}>
         {/* <Agenda
-        items={events}
-        selected={'2023-12-26'} // Set the initial selected day
-        renderItem={(item) => (
-          <View style={styles.item}>
-            <Text>{item.name}</Text>
-          </View>
-        )}
-        renderEmptyDate={() => (
-          <View style={styles.emptyDate}>
-            <Text>No events</Text>
-          </View>
-        )}
-        renderDay={(day, item) => (
-          <View style={styles.day}>
-            <Text style={styles.dayText}>{day.day}</Text>
-            {item && <Text style={styles.eventText}>{item.name}</Text>}
-          </View>
- )}
-        onDayPress={(day) => handleDayPress(day)}
-      /> */}
-        {/* <Agenda
-          items={sampleEvents} // Use the sampleEvents data here
-          selected={formatDateSelect(selectedDate)}
-          renderItem={(item) => (
-            <View style={styles.item}>
-              <Text>{item.name}</Text>
-            </View>
-          )}
-          renderEmptyData={() => {
-    return <View />;
-  }}
-
-
-          renderDay={(day, item) => {
-            const dayText = day && day.day ? day.day.toString() : "";
-            return (
-              <View style={styles.day}>
-                <Text style={styles.dayText}>{dayText}</Text>
-                {item && (
-                  <View>
-                    <Text style={styles.eventText}>{item.name}</Text>
-                    <Text
-                      style={styles.eventText}
-                    >{`${item.startTime} - ${item.endTime}`}</Text>
-                  </View>
-                )}
-              </View>
-            );
-          }}
-          onDayPress={(day) => handleDayPress(day)}
-        /> */}
-
-        {/* <Agenda
-          items={items}
-          selected={selectedDate}
-          renderItem={(item) => (
-            <View style={styles.item}>
-              <Text>{item.hotelName}</Text>
-              <Text>Status: {item.bookingStatus}</Text>
-            </View>
-          )}
-          renderEmptyData={() => {
-            return <View />;
-          }}
-          renderDay={(day, item) => {
-            const dayText = day && day.day ? day.day.toString() : "";
-            return (
-              <View style={styles.day}>
-                <Text style={styles.dayText}>{dayText}</Text>
-                {item && (
-                  <View>
-                    <Text style={styles.eventText}>{'item.hotelName'}</Text>
-                    <Text
-                      style={styles.eventText}
-                    >{item.bookingStatus}</Text>
-                  </View>
-                )}
-              </View>
-            );
-          }}
-          onDayPress={(day) => handleDayPress(day)}
-        /> */}
-
-        {/* <Agenda
           items={items}
           selected={selectedDate}
           renderItem={(item) => (
@@ -345,6 +277,12 @@ const DateSlider = () => {
           items={items}
           selected={formatDateSelect(selectedDate)}
           renderItem={(item) => (
+            <TouchableOpacity
+              onPress={() => {
+               onCardNav(item.guestId)
+              }}
+              key={item.guestId}
+            >
             <View  style={[
         styles.itemContainer,
         {
@@ -355,6 +293,8 @@ const DateSlider = () => {
               ? "red"
               : item.bookingStatus === "check_in"
               ? "green"
+              : item.bookingStatus === "check_out"
+              ? "red"
               : "white",
         },
       ]}>
@@ -367,6 +307,7 @@ const DateSlider = () => {
                 <Text>Status: {item.bookingStatus}</Text>
               </View>
             </View>
+            </TouchableOpacity>
           )}
           renderEmptyData={() => {
             return <View />;
