@@ -304,12 +304,12 @@ const CheckInDetailsScreen = (items) => {
           )}
         </View>
 
-        <TouchableOpacity onPress={handleAddGuest}>
+        {/* <TouchableOpacity onPress={handleAddGuest}>
           <View style={styles.containerGuest}>
             <FontAwesome name="plus" size={20} color="black" />
             <Text style={styles.buttonTextGuest}>Add Guest</Text>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* ================================================================================================== */}
         {data?.from_date && lastDate && isNextDay(data.from_date, lastDate) ? (

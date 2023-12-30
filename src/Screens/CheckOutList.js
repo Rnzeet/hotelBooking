@@ -93,10 +93,10 @@ const CheckOutList = () => {
    console.log(checkIns,"checkins")
   return (
     <View style={styles.container}>
-      <NavigationHead
+      {/* <NavigationHead
       heading="Check Out"
       onBackPress={handleBackPress}  
-    />
+    /> */}
       <View style={styles.header}>
         <DatePickerComp
           selectedDate={selectedDate}
@@ -159,7 +159,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f7f7f7',
-    marginTop:30,
     padding: 1,
   },
   header: {
@@ -167,7 +166,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
+    // paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     backgroundColor: '#0186C1',
@@ -178,7 +177,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
+     paddingVertical: -10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     paddingHorizontal: 10,

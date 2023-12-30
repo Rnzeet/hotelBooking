@@ -10,6 +10,7 @@ import DashboardScreen from "./Screens/DashboardScreen";
 import CheckInNav from "./Screens/CheckIn/CheckInNav";
 import HelpScreen from "./Screens/Help";
 import CheckOutNav from "./Screens/CheckOut/CheckOutNav";
+import BookingCalendar from "./Screens/TapeChart";
 
 const Drawer = createDrawerNavigator();
 const AppStack = () => {
@@ -24,18 +25,23 @@ const AppStack = () => {
                 component={DashboardScreen}
             //    options={{ headerShown: false }}
                 />
-            <Drawer.Screen
+                    {/* <Drawer.Screen
+                name="TapeChart"
+                component={BookingCalendar}
+                options={{ headerShown: false }}
+            /> */}
+            {/* <Drawer.Screen
                 name="Check In List"
                 component={CheckInNav}
                 options={{ headerShown: false }}
-            />
-            <Drawer.Screen
+            /> */}
+            {/* <Drawer.Screen
                 name="Check Out List"
                 component={CheckOutNav}
                 options={{ headerShown: false }}
-            />
+            /> */}
             <Drawer.Screen
-                name="Create Booking"
+                name="Reserve Booking"
                 component={CreateBooking}
                 options={{ headerShown: false }}
             />

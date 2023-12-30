@@ -28,34 +28,53 @@ AsyncStorage.getItem('userData')
 const handleClick=()=>{
   navigation.navigate("CheckOutDetailsScreen" ,item={checkOutDatas,hotelCode})
 }
-console.log(checkOutDatas?.booking_status,"datas")
+
+const fromDate = new Date(checkOutDatas.from_date);
+const toDate = new Date(checkOutDatas.to_date);
+const dateDifferenceInMilliseconds = toDate - fromDate;
+const dateDifferenceInDays = dateDifferenceInMilliseconds / (1000 * 60 * 60 * 24);
+
+console.log(checkOutDatas, "days");
   return (
     <TouchableOpacity onPress={handleClick}>
     <View style={styles.container}>
+    <View>
       <View style={styles.roomType}>
-        <Text>
+        <Text style={{fontSize:18}}>
           {firstLastCharater(checkOutDatas?.hotel_name)}
         </Text>
       </View>
-      <View>
-        <Text>
-          {checkOutDatas?.guest_first_name}
-        </Text>
-        <Text>
+      <View style={{backgroundColor:"orange",marginTop:3,borderRadius:7}}>
+      <Text style={{marginLeft:10}}>
           {`#${checkOutDatas?.guest_id}`}
         </Text>
-        <Text>
+        </View>
+        </View>
+      <View>
+        <Text style={{fontSize:16}}>
+          {checkOutDatas?.guest_first_name}
+        </Text>
+        <Text style={{backgroundColor:"orange",marginVertical:5,borderRadius:7,marginRight:60}}>
+          {`${checkOutDatas?.room_booking_info?.room_title}`}
+        </Text>
+
+        <Text style={{fontSize:16}}>
           {`${checkOutDatas?.from_date} > ${checkOutDatas?.to_date}`}
         </Text>
       </View>
       <View >
         <View>
-          <Text>{`₹ ${checkOutDatas?.total_sale_amount}`}
+          <Text style={{fontSize:16}}>{`₹ ${checkOutDatas?.total_sale_amount}`}
           </Text>
         </View>
         <View>
-          <Text>
+          <Text style={{fontSize:16,marginVertical:4}}>
             {`N X ${checkOutDatas?.no_of_nights} G X ${checkOutDatas?.no_of_adults + checkOutDatas?.no_of_children}`}
+          </Text>
+        </View>
+        <View>
+          <Text style={{textAlign:'right',fontSize:16}}>
+            {dateDifferenceInDays}(N)
           </Text>
         </View>
       </View>

@@ -50,24 +50,41 @@ const handleClick=()=>{
     { cancelable: false }
   );
 }
+const fromDate = new Date(checkInDatas.from_date);
+const toDate = new Date(checkInDatas.to_date);
+const dateDifferenceInMilliseconds = toDate - fromDate;
+const dateDifferenceInDays = dateDifferenceInMilliseconds / (1000 * 60 * 60 * 24);
+
 console.log(hotelCode,"hotellllllllll")
   return (
     <TouchableOpacity onPress={handleClick}>
     <View style={styles.container}>
+    <View>
       <View style={styles.roomType}>
         <Text>{firstLastCharater(checkInDatas?.room_booking_info?.room_title)}</Text>
       </View>
+      <View style={{backgroundColor:"orange",marginTop:3,borderRadius:7}}>
+      <Text style={{marginLeft:10}}>
+          {`#${checkInDatas?.guest_id}`}
+        </Text>
+        </View>
+        </View>
       <View>
-        <Text>{checkInDatas.guest_first_name}</Text>
-        <Text>{`#${checkInDatas.booking_id}`}</Text>
-        <Text>{`${checkInDatas.from_date} > ${checkInDatas.to_date}`}</Text>
+        <Text style={{fontSize:16}}>{checkInDatas.guest_first_name}</Text>
+        <Text style={{backgroundColor:"orange",marginVertical:5,borderRadius:7,marginRight:60}}>{`${checkInDatas?.room_booking_info?.room_title}`}</Text>
+        <Text style={{fontSize:16}}>{`${checkInDatas.from_date} > ${checkInDatas.to_date}`}</Text>
       </View>
       <View>
         <View>
           <Text>{`₹ ${checkInDatas.total_sale_amount}`}</Text>
         </View>
         <View>
-          <Text>{`R X ${checkInDatas.room_booking_info.no_of_rooms} G X ${checkInDatas.room_booking_info.no_of_adults + checkInDatas.room_booking_info.no_of_children}`}</Text>
+          <Text style={{fontSize:16,marginVertical:4}}>{`R X ${checkInDatas.room_booking_info.no_of_rooms} G X ${checkInDatas.room_booking_info.no_of_adults + checkInDatas.room_booking_info.no_of_children}`}</Text>
+        </View>
+        <View>
+          <Text style={{textAlign:'right',fontSize:16}}>
+            {dateDifferenceInDays}(N)
+          </Text>
         </View>
       </View>
       {/* <TouchableOpacity onPress={toggleModal} style={styles.verticle}>

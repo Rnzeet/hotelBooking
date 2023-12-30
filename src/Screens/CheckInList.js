@@ -87,10 +87,10 @@ console.log(postData,"dataaa")
 
   return (
     <View style={styles.container}>
-       <NavigationHead
+       {/* <NavigationHead
       heading="Check In"
       onBackPress={handleBackPress}  
-    />
+    /> */}
       <View style={styles.header}>
         <DatePickerComp
           selectedDate={selectedDate}
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f7f7f7',
-    marginTop:30,
+    // marginTop:30,
     padding: 1,
   },
   header: {
@@ -161,8 +161,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
     borderBottomWidth: 1,
+    paddingVertical:-25,
     borderBottomColor: '#ccc',
     backgroundColor: '#0186C1',
     paddingHorizontal: 10,
@@ -177,6 +177,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     paddingHorizontal: 10,
     backgroundColor: '#027DB1',
+    paddingVertical:-25,
   },
   count: {
     backgroundColor: '#FECD00',
