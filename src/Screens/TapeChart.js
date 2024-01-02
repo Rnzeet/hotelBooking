@@ -7,20 +7,24 @@ import {
   FlatList,
   ScrollView,
   RefreshControl,
+  ActivityIndicator,
+  BackHandler,
+  Alert
 } from "react-native";
 import axios from "axios";
 import NavigationHead from "../components/NavigationHead";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useNavigation, useFocusEffect, useIsFocused } from "@react-navigation/native";
 // import { Calendar } from "react-native-big-calendar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Agenda } from "react-native-calendars";
 
-const DateSlider = () => {
+const BookingCalendar = () => {
   const navigation = useNavigation();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [status, setStatus] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [items, setItems] = useState({});
+  const [loading, setLoading] = useState(true);
   // ========================================
   const [hotelCode, setHotelCode] = useState("");
   const [checkIns, setCheckIns] = useState([]);
@@ -86,6 +90,10 @@ const DateSlider = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+    finally {
+      setRefreshing(false);
+      setLoading(false);
+    }
 
     setRefreshing(false);
   };
@@ -105,41 +113,15 @@ const DateSlider = () => {
 
   const onRefresh = () => {
     fetchData();
+    setLoading(true);
   };
   // =====================================================================
-
-  const events = {
-    "2023-12-25": [{ name: "Meeting" }],
-    "2023-12-30": [{ name: "Coffee break" }],
-    // Add more events as needed
-  };
-  // const handleDayPress = (day) => {
-  //   console.log('Selected day:', day);
-  //   // You can handle the selected day as needed
-  // };
   const handleDayPress = (day) => {
     setSelectedDate(new Date(day.dateString));
   };
   const onDayChange = (day) => {
     setSelectedDate(new Date(day.dateString));
   };
-
-  // const onPrevDate = () => {
-  //   const prevDate = new Date(selectedDate);
-  //   prevDate.setDate(selectedDate.getDate() - 1);
-  //   setSelectedDate(prevDate);
-  // };
-
-  // const onNextDate = () => {
-  //   const nextDate = new Date(selectedDate);
-  //   nextDate.setDate(selectedDate.getDate() + 1);
-  //   setSelectedDate(nextDate);
-  // };
-
-  // const formatDate = (date) => {
-  //   const options = { month: "short", day: "numeric" };
-  //   return date.toLocaleDateString("en-US", options);
-  // };
 
   const formatDateSelect = (date) => {
     const year = date.getFullYear();
@@ -152,16 +134,6 @@ const DateSlider = () => {
     navigation.navigate("Home");
   };
 
-  // const generateNextDates = () => {
-  //   const nextDates = [];
-  //   for (let i = 1; i <= 5; i++) {
-  //     const nextDate = new Date(
-  //       selectedDate.getTime() + i * 24 * 60 * 60 * 1000
-  //     );
-  //     nextDates.push(nextDate);
-  //   }
-  //   return nextDates;
-  // };
 
   const generateNextDates = () => {
     const nextDates = [];
@@ -178,7 +150,7 @@ const DateSlider = () => {
       const checkInDatas = checkIns.find((booking) =>
         booking?.guest_id === guest_id
       );
-console.log(checkInDatas,"dtats")
+
       if (checkInDatas && checkInDatas?.booking_status==="pending") {
         navigation.navigate('CheckInDetailsScreen', { checkInDatas,hotelCode });
       }
@@ -188,8 +160,42 @@ console.log(checkInDatas,"dtats")
     },
     [checkIns, hotelCode, navigation]
   );
+  const [exitAlertVisible, setExitAlertVisible] = useState(false);
+  const isFocused = useIsFocused();
+  const showExitAlert = () => {
+    Alert.alert(
+      'Exit App',
+      'Are you sure you want to exit?',
+      [
+        { text: 'Cancel', onPress: () => setExitAlertVisible(false), style: 'cancel' },
+        { text: 'OK', onPress: () => BackHandler.exitApp() },
+      ],
+      { cancelable: false }
+    );
+  };
+  
+  useEffect(() => {
+    const handleBackPress = () => {
+      if (isFocused) {
+        // Check if you are on the first tab ("TapeChart")
+        const parentNavigator = navigation.getParent(); // Use dangerouslyGetParent
+        if (parentNavigator && parentNavigator.getState().index === 0) {
+          // If on the first tab, exit the app
+          setExitAlertVisible(true);
+          return true;
+        }
+      }
 
+      // If not on the first tab or not focused, let the default back behavior happen
+      return false;
+    };
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+
+    return () => backHandler.remove();
+    setExitAlertVisible(false);
+  }, [isFocused, navigation]);
   console.log(items,checkIns, "gatteee");
+  console.log(formatDateSelect(generateNextDates().slice(3)[0]),"dtats")
   return (
     <View
       style={{ flex: 1 }}
@@ -237,42 +243,7 @@ console.log(checkInDatas,"dtats")
         </View> */}
       </View>
       <ScrollView style={{ flex: 1 }}>
-        {/* <Agenda
-          items={items}
-          selected={selectedDate}
-          renderItem={(item) => (
-            <View style={styles.itemContainer}>
-              <View style={styles.leftItem}>
-                <Text style={styles.roomTitle}>{item.roomTitle}</Text>
-                <Text style={styles.roomId}>#{item.roomId}</Text>
-              </View>
-              <View style={styles.rightItem}>
-                <Text>{item.hotelName}</Text>
-                <Text>Status: {item.bookingStatus}</Text>
-               
-              </View>
-            </View>
-          )}
-          renderEmptyData={() => {
-            return <View />;
-          }}
-          renderDay={(day, item) => {
-            const dayText = day && day.day ? day.day.toString() : "";
-            return (
-              <View style={styles.day}>
-                <Text style={styles.dayText}>{dayText}</Text>
-                {item && (
-                  <View>
-                    <Text style={styles.eventText}>{item.hotelName}</Text>
-                   
-                  </View>
-                )}
-              </View>
-            );
-          }}
-          onDayPress={(day) => handleDayPress(day)}
-        />  */}
-
+  
         <Agenda
           items={items}
           selected={formatDateSelect(selectedDate)}
@@ -313,7 +284,16 @@ console.log(checkInDatas,"dtats")
             return <View />;
           }}
           onDayPress={(day) => handleDayPress(day)}
+          refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      />
+      {loading && (
+        <ActivityIndicator
+          size="large"
+          style={{ position: 'absolute', top: '50%', left: '50%', transform: [{ translateX: -25 }, { translateY: -25 }] }}
         />
+      )}
 
         <View style={{ marginTop: 40, marginBottom: 150 }}>
           <View style={{ flexDirection: "row" }}>
@@ -421,6 +401,7 @@ console.log(checkInDatas,"dtats")
           </View>
         </View>
       </View>
+      {exitAlertVisible && showExitAlert()}
     </View>
   );
 };
@@ -599,4 +580,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DateSlider;
+export default BookingCalendar;

@@ -76,8 +76,8 @@ const CustomDrawer = (props) => {
           <View style={styles.userAvatar}>
           <Image
             alt="Not find"
-            source={{ uri:logoPath }}
-            style={{ height: '50%', width: '100%' }}
+            source={require("./assets/icon.png")}
+            style={{ height: '70%', width: '70%',borderRadius:10 }}
           />
           </View>
           <Text

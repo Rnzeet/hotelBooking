@@ -254,29 +254,25 @@
 // TopTabScreen.js
 import React from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import CheckInNav from '../Screens/CheckIn/CheckInNav';
-import CheckOutNav from '../Screens/CheckOut/CheckOutNav';
 import BookingCalendar from "../Screens/TapeChart";
 import CheckInList from '../Screens/CheckInList';
 import CheckOutList from '../Screens/CheckOutList';
-// import { useFocusEffect, useRoute } from '@react-navigation/native';
-
-const Tab = createMaterialTopTabNavigator();
+const Tab = createMaterialTopTabNavigator({animationEnabled: false, swipeEnabled:false, });
 
 const HomeScreen = () => {
+ 
+
   return (
     <Tab.Navigator        screenOptions={{
        tabBarStyle: { backgroundColor: 'lightblue' },
       tabBarActiveTintColor: 'white',
       tabBarInactiveTintColor: 'black',
-      tabBarLabelStyle: { fontSize: 16, fontWeight: 'bold' },
+      tabBarLabelStyle: { fontSize: 13, fontWeight: 'bold' },
     }}
 >
     <Tab.Screen name="TapeChart" component={BookingCalendar} />
-      <Tab.Screen name="Check-In" component={CheckInList}  />
+      <Tab.Screen name="Check-In" component={CheckInList}   />
       <Tab.Screen name="Check-Out" component={CheckOutList} />
-      {/* <Tab.Screen name="Tab2" component={TabScreen2} />
-      <Tab.Screen name="Tab3" component={TabScreen3} /> */}
     </Tab.Navigator>
   );
 };

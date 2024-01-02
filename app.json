@@ -2,6 +2,7 @@
   "expo": {
     "name": "RateBot AI PMS",
     "slug": "hotelogix",
+    "icon":"./src/assets/icon.png",
     "extra": {
       "eas": {
         "projectId": "a6c38507-cad0-4955-b22a-d557b20d137d"
