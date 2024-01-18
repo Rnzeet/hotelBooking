@@ -178,7 +178,7 @@ const RoomTypeCard = (props) => {
             Base: {props.base} Max: {props.max}
           </Text>
         </View>
-        <Text>${props.price}</Text>
+        <Text>₹ {props.price}</Text>
         {(props.selectRoom.length > 0 && props?.selectRoom[0]?.roomType?.room_type_name === props?.roomType && props.selectRoom[0]?.price) ? ( // Show minus button when at least one room is selected
           <TouchableOpacity onPress={handleMinusPress} style={styles.minusButton}>
             <Text style={styles.minusButtonText}>-</Text>

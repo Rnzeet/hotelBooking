@@ -458,7 +458,7 @@
 // });
 
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -492,9 +492,11 @@ export const getTotalDays = (checkInDate, checkOutDate) => {
 
 const RoomDetails = ({ navigation }) => {
   const currDate = new Date().toISOString().slice(0, 10);
-
+  const currentDate = new Date();
+  const tomorrow = new Date(currentDate);
+  tomorrow.setDate(currentDate.getDate() + 1);
   const [checkInDate, setCheckInDate] = useState(currDate);
-  const [checkOutDate, setCheckOutDate] = useState(currDate);
+  const [checkOutDate, setCheckOutDate] = useState(tomorrow.toISOString().slice(0, 10));
   const [activeOption, setActiveOption] = useState("Guest");
   const [roomTypes, setRoomTypes] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -518,6 +520,28 @@ const RoomDetails = ({ navigation }) => {
 
   useEffect(() => {
     fetchHotelCode();
+  }, []);
+  const isMounted = useRef(false);
+  console.log(isMounted,"mount")
+  useFocusEffect(
+    React.useCallback(() => {
+      isMounted.current = true;
+      if (isMounted.current) {
+        // Clear selectedRooms only on the first focus
+        setSelectedRooms([]);
+        selectedRooms.length=0;
+        isMounted.current = true;
+      } else {
+        // Ensure that fetchData is called only after hotelCode is fetched
+        if (hotelCode) {
+          getRoomTypes();
+        }
+      }
+    }, [hotelCode])
+  );
+  useEffect(() => {
+    selectedRooms.length=0;
+    setSelectedRooms([]);
   }, []);
 
   const getRoomTypes = async () => {
@@ -662,6 +686,7 @@ const RoomDetails = ({ navigation }) => {
         roomType: currRoomType,
         room: selectedRoom,
         price: selectedRoom.price,
+        extraPrice:selectedRoom.extra_bed_price
       };
 
       setSelectedRooms([roomDetails]);
@@ -669,10 +694,19 @@ const RoomDetails = ({ navigation }) => {
 
     closeModal();
   };
-console.log(roomTypes,"typess")
+  useEffect(()=>{
+  if(checkInDate>=checkOutDate){
+    alert("Starting date cannot be greater than or equal to End date")
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setCheckOutDate(tomorrow.toISOString().slice(0, 10));
+  }
+   },[checkInDate,checkOutDate])
+  
+console.log(selectedRooms,roomTypes,"typess")
   return (
     <SafeAreaView style={styles.container}>
-      <NavigationHead heading="Stay Details" onBackPress={handleBackPress} />
+      <NavigationHead heading="Room Details" onBackPress={handleBackPress} />
       <View style={styles.header}>
         <View>
           <Text style={styles.headerText}>Check In</Text>
@@ -787,7 +821,7 @@ console.log(roomTypes,"typess")
               availableRooms.map((room) => (
                 <View key={room.room_number}>
                   <Text style={{ fontSize: 18, fontWeight: "normal" }}>
-                    Room Number: {room.room_number}
+                    Room Number: {room?.room_number}
                   </Text>
                   <View style={styles.button}>
                     <TouchableOpacity onPress={() => handleRoomSelect(room)}>
@@ -810,7 +844,7 @@ console.log(roomTypes,"typess")
         total={totalPrice}
         count={totalPrice===0 ? 0 : selectedRooms.length}
         rooms={selectedRooms}
-        link="Stay Details"
+        link="Guest Detail"
         navigation={navigation}
         dates={{ checkInDate, checkOutDate }}
       />

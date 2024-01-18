@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import { FontAwesome } from '@expo/vector-icons'; // Assuming you have FontAwesome installed
-
+import { FontAwesome5 } from '@expo/vector-icons';
 export const firstLastCharater = (item) => {
   if (item?.includes(" ")) {
     // If the item contains a space, return the first character of each word
@@ -15,9 +15,13 @@ export const firstLastCharater = (item) => {
 
 const SimpleCard = ({ dates,item,details,id }) => {
 
-
-
-// console.log()
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const month = date.toLocaleString('default', { month: 'short' });
+    const day = date.getDate();
+    return `${month} ${day}`;
+  };
+console.log(item,details,"dates")
   return (
     <View style={styles.container}>
       <View style={styles.roomType}>
@@ -28,13 +32,13 @@ const SimpleCard = ({ dates,item,details,id }) => {
       </View>
       <View>
         <Text>
-          {details?.firstName}
+          {details?.firstName}  {details?.lastName}
+        </Text>
+        <Text style={{backgroundColor:'orange',borderRadius:5,textAlign:'center'}}>
+          {`# ${item?.type}`}
         </Text>
         <Text>
-          {`#${id}`}
-        </Text>
-        <Text>
-          {`${dates.checkInDate} > ${dates.checkOutDate}`}
+        {`${formatDate(dates.checkInDate)} > ${formatDate(dates.checkOutDate)}`}
         </Text>
       </View>
       <View >
@@ -44,7 +48,7 @@ const SimpleCard = ({ dates,item,details,id }) => {
         </View>
         <View>
           <Text>
-            {`N X ${item.count}`}
+             <FontAwesome5 name="male" size={20} color="blue" />   X  {details?.adult+details?.child}
           </Text>
         </View>
       </View>

@@ -1,10 +1,12 @@
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SingleDetailsEdit from '../components/SingleDetailsEdit'
 import CheckInButton from '../components/Buttons/CheckInButton';
 import { getTotalDays } from './RoomDetails';
 import axios from 'axios';
 import { userDataRetriever } from '../APIS/Context';
+import ReservedDetailsEdit from '../components/ReservedFinal';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 
 const CheckInFinal = ({ route, navigation }) => {
   // {
@@ -69,25 +71,45 @@ const CheckInFinal = ({ route, navigation }) => {
   //   ],
   //   "booking_service": []
   //   }
-  const { total, count, rooms, details, dates,bookingId } = route.params.dataToSend;
+  // const { total, count, rooms, details, dates,bookingId } = route.params.dataToSend;
   const [payments, setPayments] = useState([]);
-  
+  const isFocused = useIsFocused();
   const updatePayments = (paymentDetails) => {
     setPayments([...payments, paymentDetails]);
   };
   
-  console.log(payments,"payments")
- 
-
-  console.log(details.personDetails.firstName,"personDetails")
-  // ...
-
-// ...
+const [bookingData, setBookingData] = useState([]);
+const fetchDataa = async () => {
+  const apiUrl = "https://api.ratebotai.com:8443/get_booking_data_pms";
+  const postData = {
+    booking_id: route?.params?.booking_id,
+  };
+  try {
+    const response = await axios.post(apiUrl, postData);
+    setBookingData(response?.data);
+  } catch (error) {
+    alert("Error fetching room:", error);
+  }
+};
+useEffect(() => {
+  if (route?.params) {
+    fetchDataa();
+  }
+}, [route?.params]);
+// useFocusEffect(
+//   React.useCallback(() => {
+//     // Ensure that fetchData is called only after hotelCode is fetched
+//     if (route?.params) {
+//       fetchDataa();
+//     }
+//   }, [route,bookingData])
+// );
+console.log(bookingData,route,"booking")
 
   return (
     <View style={styles.container}>
       <ScrollView style={{marginBottom:50}}>
-        <SingleDetailsEdit
+        {/* <SingleDetailsEdit
           total={total}
           count={count}
           rooms={rooms}
@@ -95,6 +117,9 @@ const CheckInFinal = ({ route, navigation }) => {
           dates={dates}
           bookingId={bookingId}
           updatePayments={updatePayments}
+        /> */}
+        <ReservedDetailsEdit
+         item={bookingData}
         />
       </ScrollView>
       {/* <CheckInButton 

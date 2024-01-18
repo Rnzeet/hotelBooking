@@ -25,11 +25,11 @@ const AppStack = () => {
                 component={DashboardScreen}
             //    options={{ headerShown: false }}
                 />
-                    {/* <Drawer.Screen
-                name="TapeChart"
+                    <Drawer.Screen
+                name="Calendar"
                 component={BookingCalendar}
-                options={{ headerShown: false }}
-            /> */}
+                options={{ headerShown: true }}
+            />
             {/* <Drawer.Screen
                 name="Check In List"
                 component={CheckInNav}

@@ -4,6 +4,9 @@ import { FontAwesome } from '@expo/vector-icons';
 import SimpleCard from './SimpleCard';
 import Modal from 'react-native-modal'; // Import the modal library
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
+
 
 const SingleDetailsEdit = ({ navigation, rooms,total,count,details,dates ,updatePayments,bookingId}) => {
 
@@ -103,7 +106,34 @@ const SingleDetailsEdit = ({ navigation, rooms,total,count,details,dates ,update
      togglePreferenceModal(); // Close the payment modal
 
   }
+   const navigations = useNavigation();
+   const OnhandleHome = () => {
+    // Wrap the navigation inside a function and call it
+    const resetAndNavigateHome = () => {
+      const resetAction = CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'Home' }],
+      });
+      navigations.dispatch(resetAction);
+    };
 
+    resetAndNavigateHome();
+  };
+// const OnhandleHome=()=>{
+//   navigations.navigate('Home');
+// }
+// // Inside your component or navigation screen
+// const resetAction = CommonActions.reset({
+//   index: 0, // Index of the screen to navigate to (in this case, the first screen)
+//   routes: [
+//     { name: 'Home' }, // Replace 'HomeScreen' with the name of your desired screen
+//   ],
+// });
+
+// // Use the reset action to clear the stack and navigate to the specified screen
+// navigation.dispatch(resetAction);
+
+  console.log(selectedServices,"services")
   return (
     <View >
       <View style={styles.header2}>
@@ -133,6 +163,21 @@ const SingleDetailsEdit = ({ navigation, rooms,total,count,details,dates ,update
           </View>
         ))}
       </ScrollView>
+      {/* <View style={{ marginHorizontal:8, borderRadius: 12,marginVertical:30,backgroundColor:'lightblue',padding:10}}>
+      <View >   
+        <Text style={{ color: "black", fontWeight: 600, fontSize: 18, }}>
+          Add Ons   
+        </Text>
+      </View>
+      <View style={styles.line}></View>
+      {selectedServices.map((serviceGroup, index) => (
+        <View key={index} style={{flexDirection:'row',justifyContent:'space-between'}}> 
+        <Text  style={{ color: "black", fontWeight: 500, fontSize: 16, marginTop:10,}}>{serviceGroup?.name}</Text>
+        <Text  style={{ color: "black", fontWeight: 500, fontSize: 16,right:10,marginTop:10 }}>$ {serviceGroup?.price}</Text>
+        </View>
+      ))}
+    </View> */}
+
 
       <View style={styles.payCard}>
         <Text style={{ color: "white", fontWeight: 400, fontSize: 18 }}>
@@ -155,14 +200,14 @@ const SingleDetailsEdit = ({ navigation, rooms,total,count,details,dates ,update
         <Text style={{ fontWeight: 500, fontSize: 18, marginTop: 5, marginRight: 15, color: '#FECD00' }}>₹ {totalPaid}</Text>
       </View>
       <ScrollView style={styles.cards}>
-          <View style={styles.preferenceBtn}>
+          {/* <View style={styles.preferenceBtn}>
             <TouchableOpacity onPress={togglePreferenceModal} style={{ flexDirection: "row", alignItems: "center", padding: 5 }}>
               <Text style={styles.btn}>
                 <FontAwesome name="pencil" size={16} color="#000" />
                 Preferences
               </Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
 
           {preferences?.map((item, index) => (
             <View key={index} style={styles.card}>
@@ -170,7 +215,14 @@ const SingleDetailsEdit = ({ navigation, rooms,total,count,details,dates ,update
             </View>
           ))}
         </ScrollView>
-
+  <View style={styles.preferenceBtn}>
+            <TouchableOpacity onPress={OnhandleHome} style={{ flexDirection: "row", alignItems: "center", padding: 5 }}>
+              <Text style={styles.btn}>
+                {/* <FontAwesome name="pencil" size={16} color="#000" /> */}
+                Go to Home
+              </Text>
+            </TouchableOpacity>
+          </View>
       {/* Payment Modal */}
       <Modal isVisible={isPaymentModalVisible}>
         <View style={styles.modalContainer}>
@@ -329,7 +381,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FECD00',
     padding: 10,
     borderRadius: 5,
-    elevation: 2,
+    // elevation: 2,
     
   },
   input: {
@@ -369,5 +421,11 @@ const styles = StyleSheet.create({
   preferenceBtn: {
     marginTop: 10,
     justifyContent: "center",
+    alignItems: "center",
+  },
+  line: {
+    marginTop: 5,
+    height: 1, // Adjust the height to change the thickness of the line
+    backgroundColor: "black", // Change the color of the line
   },
 });

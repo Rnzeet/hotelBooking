@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity ,Alert} from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 import { firstLastCharater } from './SimpleCard';
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 const CheckInCard = ({ checkInDatas }) => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -34,28 +34,14 @@ const CheckInCard = ({ checkInDatas }) => {
     setModalVisible(false);
   }
 const handleClick=()=>{
-  // alert("Check in only allowed for the day atfer the last audit day")
-  // navigation.navigate("CheckInDetailsScreen" ,item={checkInDatas,hotelCode})
-  Alert.alert(
-    'Check-in Alert',
-    'Check-in is only allowed for the day after the last audited day',
-    [
-      {
-        text: 'OK',
-        onPress: () => {
-          navigation.navigate('CheckInDetailsScreen', { checkInDatas, hotelCode });
-        },
-      },
-    ],
-    { cancelable: false }
-  );
+   navigation.navigate("CheckIn Details" ,item={checkInDatas,hotelCode})
 }
 const fromDate = new Date(checkInDatas.from_date);
 const toDate = new Date(checkInDatas.to_date);
 const dateDifferenceInMilliseconds = toDate - fromDate;
 const dateDifferenceInDays = dateDifferenceInMilliseconds / (1000 * 60 * 60 * 24);
 
-console.log(hotelCode,"hotellllllllll")
+console.log(checkInDatas,"hotellllllllll")
   return (
     <TouchableOpacity onPress={handleClick}>
     <View style={styles.container}>
@@ -65,27 +51,25 @@ console.log(hotelCode,"hotellllllllll")
       </View>
       <View style={{backgroundColor:"orange",marginTop:3,borderRadius:7}}>
       <Text style={{marginLeft:10}}>
-          {`#${checkInDatas?.guest_id}`}
+          {`#${checkInDatas?.booking_id}`}
         </Text>
         </View>
         </View>
       <View>
         <Text style={{fontSize:16}}>{checkInDatas.guest_first_name}</Text>
-        <Text style={{backgroundColor:"orange",marginVertical:5,borderRadius:7,marginRight:60}}>{`${checkInDatas?.room_booking_info?.room_title}`}</Text>
-        <Text style={{fontSize:16}}>{`${checkInDatas.from_date} > ${checkInDatas.to_date}`}</Text>
+        <Text style={{backgroundColor:"orange",marginVertical:5,borderRadius:7,marginRight:60,textAlign:'center'}}>{`${checkInDatas?.room_booking_info?.room_name}`}</Text>
+        <Text style={{fontSize:16}}>
+        {/* {`${checkInDatas.from_date} > ${checkInDatas.to_date}`} */}
+        {`${fromDate.toLocaleDateString('en-US', { month: 'short' })} ${fromDate.getDate()} > ${toDate.toLocaleDateString('en-US', { month: 'short' })} ${toDate.getDate()}`} <Text style={{ fontSize: 16, fontStyle: 'italic' }}> {dateDifferenceInDays}(N)</Text></Text>
       </View>
       <View>
         <View>
           <Text>{`₹ ${checkInDatas.total_sale_amount}`}</Text>
         </View>
         <View>
-          <Text style={{fontSize:16,marginVertical:4}}>{`R X ${checkInDatas.room_booking_info.no_of_rooms} G X ${checkInDatas.room_booking_info.no_of_adults + checkInDatas.room_booking_info.no_of_children}`}</Text>
+          <Text style={{fontSize:16,marginVertical:4}}> <FontAwesome5 name="male" size={20} color="blue" /> {`X ${checkInDatas.room_booking_info.no_of_adults + checkInDatas.room_booking_info.no_of_children}`}</Text>
         </View>
-        <View>
-          <Text style={{textAlign:'right',fontSize:16}}>
-            {dateDifferenceInDays}(N)
-          </Text>
-        </View>
+
       </View>
       {/* <TouchableOpacity onPress={toggleModal} style={styles.verticle}>
         <FontAwesome name="ellipsis-v" size={20} color="black" />
@@ -135,7 +119,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 5,
-    paddingRight:15
+    paddingRight:15,
+    // backgroundColor:'lightpurple'
   },
   roomType: {
     backgroundColor: '#FECD00',

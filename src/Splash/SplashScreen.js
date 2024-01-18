@@ -8,7 +8,7 @@ const Splashscreen = (props) => {
   const [hasAnimationPlayedTwice, setHasAnimationPlayedTwice] = useState(false);
 
   useEffect(() => {
-    lottieRef.current.play();
+    lottieRef?.current.play();
   }, []);
 
   const handleAnimationFinish = () => {

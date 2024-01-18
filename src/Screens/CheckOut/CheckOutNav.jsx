@@ -9,7 +9,7 @@ const CheckOutNav = () => {
     return (
       <Stack.Navigator initialRouteName="Check Out List">
       <Stack.Screen name="Check Out List" component={CheckOutList}   options={{ headerShown: false }} />
-        <Stack.Screen name="CheckOutDetailsScreen" component={CheckOutDetailsScreen}   options={{ headerShown: true }} />
+        <Stack.Screen name="CheckOut Details" component={CheckOutDetailsScreen}   options={{ headerShown: true }} />
       </Stack.Navigator>
     );
   };

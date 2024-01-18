@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet,TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet,TouchableOpacity, Image } from 'react-native'
 import React, { useState } from 'react';
 import { FontAwesome } from '@expo/vector-icons'; // Assuming you have FontAwesome installed
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { firstLastCharater } from './SimpleCard';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 
 const CheckOutCard = ({ checkOutDatas }) => {
@@ -26,7 +27,7 @@ AsyncStorage.getItem('userData')
   console.error('Error retrieving user data:', error);
 });
 const handleClick=()=>{
-  navigation.navigate("CheckOutDetailsScreen" ,item={checkOutDatas,hotelCode})
+  navigation.navigate("CheckOut Details" ,item={checkOutDatas,hotelCode})
 }
 
 const fromDate = new Date(checkOutDatas.from_date);
@@ -46,7 +47,7 @@ console.log(checkOutDatas, "days");
       </View>
       <View style={{backgroundColor:"orange",marginTop:3,borderRadius:7}}>
       <Text style={{marginLeft:10}}>
-          {`#${checkOutDatas?.guest_id}`}
+          {`#${checkOutDatas?.booking_id}`}
         </Text>
         </View>
         </View>
@@ -54,13 +55,12 @@ console.log(checkOutDatas, "days");
         <Text style={{fontSize:16}}>
           {checkOutDatas?.guest_first_name}
         </Text>
-        <Text style={{backgroundColor:"orange",marginVertical:5,borderRadius:7,marginRight:60}}>
-          {`${checkOutDatas?.room_booking_info?.room_title}`}
+        <Text style={{backgroundColor:"orange",marginVertical:5,borderRadius:7,marginRight:60,textAlign:'center'}}>
+          {`${checkOutDatas?.room_booking_info?.room_name}`}
         </Text>
 
         <Text style={{fontSize:16}}>
-          {`${checkOutDatas?.from_date} > ${checkOutDatas?.to_date}`}
-        </Text>
+        {`${fromDate.toLocaleDateString('en-US', { month: 'short' })} ${fromDate.getDate()} > ${toDate.toLocaleDateString('en-US', { month: 'short' })} ${toDate.getDate()}`} <Text style={{ fontSize: 16, fontStyle: 'italic' }}> {dateDifferenceInDays}(N)</Text></Text>
       </View>
       <View >
         <View>
@@ -68,14 +68,7 @@ console.log(checkOutDatas, "days");
           </Text>
         </View>
         <View>
-          <Text style={{fontSize:16,marginVertical:4}}>
-            {`N X ${checkOutDatas?.no_of_nights} G X ${checkOutDatas?.no_of_adults + checkOutDatas?.no_of_children}`}
-          </Text>
-        </View>
-        <View>
-          <Text style={{textAlign:'right',fontSize:16}}>
-            {dateDifferenceInDays}(N)
-          </Text>
+          <Text style={{fontSize:16,marginVertical:4}}> <FontAwesome5 name="male" size={20} color="blue" /> {`X ${checkOutDatas.room_booking_info.no_of_adults + checkOutDatas.room_booking_info.no_of_children}`}</Text>
         </View>
       </View>
       {/* <View style={styles.verticle}>
@@ -112,6 +105,14 @@ const styles = StyleSheet.create({
     justifyContent:"center",
     alignItems:"center",
     borderRadius:5,
-  }
+  },
+  imageContainer: {
+    marginBottom: 10, // Adjust as needed
+    alignItems: 'center',
+  },
+  checkoutImage: {
+    width: 60, // Adjust the dimensions based on your design
+    height: 60,
+  },
 })
 export default CheckOutCard

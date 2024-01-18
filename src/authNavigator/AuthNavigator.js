@@ -11,6 +11,9 @@ import CheckInNav from '../Screens/CheckIn/CheckInNav';
 import HomeNav from '../Screens/HomeNav/HomeNav';
 import CheckInDetailsScreen from '../Screens/CheckInDetailsScreen';
 import CheckOutDetailsScreen from '../Screens/CheckOutDetailsScreen';
+import HelpScreen from '../Screens/Help';
+import HomeScreen from '../Botttom/HomeScreen';
+import ReservedDetailsScreen from '../Screens/ReservedDetailsScreen';
 const Stack = createStackNavigator();
 
 const AuthNavigator = () => {
@@ -18,12 +21,13 @@ const AuthNavigator = () => {
     <Stack.Navigator initialRouteName="login">
       <Stack.Screen name="login" component={LogIn} options={{headerShown:false}} />
       <Stack.Screen name="signUp" component={SignUp} options={{headerShown:false}}/>
+      {/* <Stack.Screen name="Home" component={HomeScreen} options={{headerShown:false}}/> */}
+      <Stack.Screen name="Help" component={HelpScreen} options={{headerShown:true}}/>
       <Stack.Screen name="appStack" component={AppStack} options={{headerShown:false}}/>
-      <Stack.Screen name="Home" component={HomeNav} options={{headerShown:false}}/>
-      <Stack.Screen name="CheckInDetailsScreen" component={CheckInDetailsScreen} options={{headerShown:true}}/>
-      <Stack.Screen name="CheckOutDetailsScreen" component={CheckOutDetailsScreen}   options={{ headerShown: true }} />
-
-
+      {/* <Stack.Screen name="Home" component={HomeNav} options={{headerShown:false}}/> */}
+      <Stack.Screen name="Reservation Details" component={ReservedDetailsScreen} options={{headerShown:true}}/>
+      <Stack.Screen name="CheckIn Details" component={CheckInDetailsScreen} options={{headerShown:true}}/>
+      <Stack.Screen name="CheckOut Details" component={CheckOutDetailsScreen}   options={{ headerShown: true }} />
     </Stack.Navigator>
   );
 };

@@ -12,8 +12,8 @@ const CreateBooking = () => {
   return (
     <Stack.Navigator initialRouteName="Room Details">
       <Stack.Screen name="Room Details" component={RoomDetails} options={{headerShown:false}} />
-      <Stack.Screen name="Stay Details" component={StayDetails} options={{headerShown:true}}/>
-      <Stack.Screen name="Single Edit" component={CheckInFinal} options={{headerShown:true}}/>
+      <Stack.Screen name="Guest Detail" component={StayDetails} options={{headerShown:true}}/>
+      <Stack.Screen name="Reservation Detail" component={CheckInFinal} options={{headerShown:true}}/>
 
     </Stack.Navigator>
   );

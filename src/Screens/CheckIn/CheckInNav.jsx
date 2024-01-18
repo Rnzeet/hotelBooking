@@ -9,7 +9,7 @@ const CheckInNav = () => {
     return (
       <Stack.Navigator initialRouteName="Check In List">
       <Stack.Screen name="Check In List" component={CheckInList}   options={{ headerShown: false }} />
-        <Stack.Screen name="CheckInDetailsScreen" component={CheckInDetailsScreen}   options={{ headerShown: true, tabBarVisible: false }} />
+        <Stack.Screen name="CheckIn Details" component={CheckInDetailsScreen}   options={{ headerShown: true, tabBarVisible: false }} />
       </Stack.Navigator>
     );
   };

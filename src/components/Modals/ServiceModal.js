@@ -41,7 +41,7 @@ const ServiceModal = ({ isVisible, onClose, onSelectService }) => {
                   onPress={() => toggleService(service)}
                 >
                   <Text style={styles.serviceName}>{service.name}</Text>
-                  <Text style={styles.servicePrice}>$ {service.price}</Text>
+                  <Text style={styles.servicePrice}>₹ {service.price}</Text>
                 </TouchableOpacity>
                 {selectedServices.some((s) => s.id === service.id) && (
                   <TouchableOpacity

@@ -9,14 +9,19 @@ import {
   RefreshControl,
   ActivityIndicator,
   BackHandler,
-  Alert
+  Alert,
 } from "react-native";
 import axios from "axios";
 import NavigationHead from "../components/NavigationHead";
-import { useNavigation, useFocusEffect, useIsFocused } from "@react-navigation/native";
+import {
+  useNavigation,
+  useFocusEffect,
+  useIsFocused,
+} from "@react-navigation/native";
 // import { Calendar } from "react-native-big-calendar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Agenda } from "react-native-calendars";
+import CollapsibleCard from "../components/CollapsableCard";
 
 const BookingCalendar = () => {
   const navigation = useNavigation();
@@ -25,6 +30,7 @@ const BookingCalendar = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [items, setItems] = useState({});
   const [loading, setLoading] = useState(true);
+  const [available, setAvailable] = useState();
   // ========================================
   const [hotelCode, setHotelCode] = useState("");
   const [checkIns, setCheckIns] = useState([]);
@@ -49,8 +55,8 @@ const BookingCalendar = () => {
     const apiUrl = "https://api.ratebotai.com:8443/get_check_in_orders";
     const postData = {
       from_date: formatDateSelect(selectedDate),
-      to_date: formatDateSelect(generateNextDates().slice(3)[0]),
-      // to_date: formatDateSelect(selectedDate),
+      // to_date: formatDateSelect(generateNextDates().slice(3)[0]),
+      to_date: formatDateSelect(selectedDate),
       hotel_code: hotelCode,
     };
     console.log(postData, "dataaa");
@@ -63,7 +69,7 @@ const BookingCalendar = () => {
       setStatus(response.data.data);
       const items = {};
 
-      checkIns?.forEach((booking) => {
+      response?.data?.data?.forEach((booking) => {
         const startDate = new Date(booking.from_date);
         const endDate = new Date(booking.to_date);
 
@@ -77,8 +83,11 @@ const BookingCalendar = () => {
             hotelName: booking.hotel_name,
             bookingStatus: booking.booking_status,
             roomTitle: booking?.room_booking_info?.room_title,
-            roomId: booking?.room_booking_info?.room_id,
-            guestId:booking?.guest_id,
+            roomId: booking?.booking_id,
+            guestId: booking?.guest_id,
+            guestName:booking?.guest_first_name,
+            guestLastName:booking?.last_name,
+            roomNo:booking?.room_booking_info?.room_name
           });
 
           startDate.setDate(startDate.getDate() + 1);
@@ -89,10 +98,28 @@ const BookingCalendar = () => {
       setItems(items);
     } catch (error) {
       console.error("Error fetching data:", error);
-    }
-    finally {
+    } finally {
       setRefreshing(false);
       setLoading(false);
+    }
+
+    setRefreshing(false);
+  };
+
+  const fetchAvailableData = async () => {
+    setRefreshing(true);
+
+    const apiUrl = "https://api.ratebotai.com:8443/current_rooms_analysis_pms";
+    const postData = {
+      hotel_code: hotelCode,
+      from_date: formatDateSelect(selectedDate),
+    };
+    console.log(postData, "dataaa");
+    try {
+      const response = await axios.post(apiUrl, postData);
+      setAvailable(response?.data?.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
 
     setRefreshing(false);
@@ -107,21 +134,22 @@ const BookingCalendar = () => {
       // Ensure that fetchData is called only after hotelCode is fetched
       if (hotelCode) {
         fetchData();
+        fetchAvailableData();
       }
     }, [selectedDate, hotelCode])
   );
 
   const onRefresh = () => {
     fetchData();
-    setLoading(true);
+    fetchAvailableData();
   };
   // =====================================================================
   const handleDayPress = (day) => {
     setSelectedDate(new Date(day.dateString));
   };
-  const onDayChange = (day) => {
-    setSelectedDate(new Date(day.dateString));
-  };
+  // const onDayChange = (day) => {
+  //   setSelectedDate(new Date(day.dateString));
+  // };
 
   const formatDateSelect = (date) => {
     const year = date.getFullYear();
@@ -130,72 +158,92 @@ const BookingCalendar = () => {
     return `${year}-${month}-${day}`;
   };
 
-  const handleBackPress = () => {
-    navigation.navigate("Home");
-  };
+  // const handleBackPress = () => {
+  //   navigation.navigate("Home");
+  // };
 
-
-  const generateNextDates = () => {
-    const nextDates = [];
-    for (let i = 1; i <= 5; i++) {
-      const nextDate = new Date(
-        selectedDate.getTime() + i * 24 * 60 * 60 * 1000
-      );
-      nextDates.push(nextDate);
-    }
-    return nextDates;
-  };
+  // const generateNextDates = () => {
+  //   const nextDates = [];
+  //   for (let i = 1; i <= 5; i++) {
+  //     const nextDate = new Date(
+  //       selectedDate.getTime() + i * 24 * 60 * 60 * 1000
+  //     );
+  //     nextDates.push(nextDate);
+  //   }
+  //   return nextDates;
+  // };
   const onCardNav = useCallback(
     (guest_id) => {
-      const checkInDatas = checkIns.find((booking) =>
-        booking?.guest_id === guest_id
+      const checkInDatas = checkIns.find(
+        (booking) => booking?.guest_id === guest_id
       );
-
-      if (checkInDatas && checkInDatas?.booking_status==="pending") {
-        navigation.navigate('CheckInDetailsScreen', { checkInDatas,hotelCode });
+      if (checkInDatas && checkInDatas?.booking_status === "pending") {
+        navigation.navigate("Reservation Details", {
+          checkInDatas,
+          hotelCode,
+        });
+      } else if (checkInDatas && checkInDatas?.booking_status === "check_in") {
+        navigation.navigate(
+          "CheckIn Details",
+          (item={checkInDatas, hotelCode })
+        );
       }
-    else  if (checkInDatas && checkInDatas?.booking_status==="check_in") {
-      navigation.navigate("CheckOutDetailsScreen" ,item={checkOutDatas:checkInDatas,hotelCode})
-      }
-    },
-    [checkIns, hotelCode, navigation]
-  );
-  const [exitAlertVisible, setExitAlertVisible] = useState(false);
-  const isFocused = useIsFocused();
-  const showExitAlert = () => {
-    Alert.alert(
-      'Exit App',
-      'Are you sure you want to exit?',
-      [
-        { text: 'Cancel', onPress: () => setExitAlertVisible(false), style: 'cancel' },
-        { text: 'OK', onPress: () => BackHandler.exitApp() },
-      ],
-      { cancelable: false }
-    );
-  };
-  
-  useEffect(() => {
-    const handleBackPress = () => {
-      if (isFocused) {
-        // Check if you are on the first tab ("TapeChart")
-        const parentNavigator = navigation.getParent(); // Use dangerouslyGetParent
-        if (parentNavigator && parentNavigator.getState().index === 0) {
-          // If on the first tab, exit the app
-          setExitAlertVisible(true);
-          return true;
+      else if (checkInDatas && checkInDatas?.booking_status === "check_out") {
+        navigation.navigate(
+          "CheckOut Details",
+          (item = { checkOutDatas: checkInDatas, hotelCode })
+        );
         }
-      }
+    [checkIns, hotelCode, navigation]
+      });
+  // const [exitAlertVisible, setExitAlertVisible] = useState(false);
+  // const isFocused = useIsFocused();
+  // const showExitAlert = () => {
+  //   Alert.alert(
+  //     "Exit App",
+  //     "Are you sure you want to exit?",
+  //     [
+  //       {
+  //         text: "Cancel",
+  //         onPress: () => setExitAlertVisible(false),
+  //         style: "cancel",
+  //       },
+  //       { text: "OK", onPress: () => BackHandler.exitApp() },
+  //     ],
+  //     { cancelable: false }
+  //   );
+  // };
 
-      // If not on the first tab or not focused, let the default back behavior happen
-      return false;
-    };
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+  // useEffect(() => {
+  //   const handleBackPress = () => {
+  //     if (isFocused) {
+  //       // Check if you are on the first tab ("TapeChart")
+  //       const parentNavigator = navigation.getParent(); // Use dangerouslyGetParent
+  //       if (parentNavigator && parentNavigator.getState().index === 0) {
+  //         // If on the first tab, exit the app
+  //         setExitAlertVisible(true);
+  //         return true;
+  //       }
+  //     }
 
-    return () => backHandler.remove();
-    setExitAlertVisible(false);
-  }, [isFocused, navigation]);
-  console.log(items,checkIns, "gatteee");
-  console.log(formatDateSelect(generateNextDates().slice(3)[0]),"dtats")
+  //     // If not on the first tab or not focused, let the default back behavior happen
+  //     return false;
+  //   };
+  //   const backHandler = BackHandler.addEventListener(
+  //     "hardwareBackPress",
+  //     handleBackPress
+  //   );
+
+  //   return () => backHandler.remove();
+  //   setExitAlertVisible(false);
+  // }, [isFocused, navigation]);
+  useEffect(() => {
+    // Fetch data based on selectedDate and update items state
+    fetchData();
+    fetchAvailableData();
+  }, [selectedDate, hotelCode]);
+
+  console.log(items, checkIns, loading, "gatteee");
   return (
     <View
       style={{ flex: 1 }}
@@ -203,7 +251,7 @@ const BookingCalendar = () => {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      <View style={{ flexDirection: "column", justifyContent: "flex-start" }}>
+      <View style={{ flexDirection: "column", justifyContent: "flex-start" ,}}>
         {/* <View style={styles.container}>
           <View></View>
           <TouchableOpacity style={styles.arrowButton} onPress={onPrevDate}>
@@ -242,170 +290,89 @@ const BookingCalendar = () => {
         />
         </View> */}
       </View>
-      <ScrollView style={{ flex: 1 }}>
-  
-        <Agenda
-          items={items}
-          selected={formatDateSelect(selectedDate)}
-          renderItem={(item) => (
-            <TouchableOpacity
-              onPress={() => {
-               onCardNav(item.guestId)
-              }}
-              key={item.guestId}
+      {/* <ScrollView style={{ flex: 1 }}> */}
+
+      <Agenda
+        items={items}
+        selected={formatDateSelect(selectedDate)}
+        renderItem={(item) => (
+          <TouchableOpacity
+            onPress={() => {
+              onCardNav(item.guestId);
+            }}
+            key={item.guestId}
+          >
+            <View
+              style={[
+                styles.itemContainer,
+                {
+                  backgroundColor:
+                    item.bookingStatus === "pending"
+                      ? "blue"
+                      : item.bookingStatus === "cancelled"
+                      ? "pink"
+                      : item.bookingStatus === "check_in"
+                      ? "green"
+                      : item.bookingStatus === "check_out"
+                      ? "red"
+                      : "purple",
+                },
+              ]}
             >
-            <View  style={[
-        styles.itemContainer,
-        {
-          backgroundColor:
-            item.bookingStatus === "pending"
-              ? "blue"
-              : item.bookingStatus === "cancelled"
-              ? "red"
-              : item.bookingStatus === "check_in"
-              ? "green"
-              : item.bookingStatus === "check_out"
-              ? "red"
-              : "white",
-        },
-      ]}>
               <View style={styles.leftItem}>
-                <Text style={styles.roomTitle}>{item.roomTitle}</Text>
-                <Text style={styles.roomId}>#{item.roomId}</Text>
+                <Text style={styles.roomTitle}>{item?.roomTitle}</Text>
+                <Text style={styles.roomId}>#{item?.roomId}</Text>
               </View>
               <View style={styles.rightItem}>
-                <Text>{item.hotelName}</Text>
-                <Text>Status: {item.bookingStatus}</Text>
+              <Text style={styles.roomTitle}>{item?.guestName} {item?.guestLastName}</Text>
+                <Text style={styles.roomId}>{item?.hotelName}</Text>
+                <Text style={[styles.roomId,{fontSize:14,fontWeight:'bold'}]}>{item?.roomNo}</Text>
+                {/* <Text style={styles.roomId}>Status: {item?.bookingStatus}</Text> */}
+                {item.bookingStatus === "pending" ? (
+                <Text style={styles.roomId}>Status:Confirmed</Text>
+              ) : (
+                <Text style={styles.roomId}>
+                  Status: {item?.bookingStatus}
+                </Text>
+              )}
               </View>
             </View>
-            </TouchableOpacity>
-          )}
-          renderEmptyData={() => {
-            return <View />;
-          }}
-          onDayPress={(day) => handleDayPress(day)}
-          refreshControl={
+          </TouchableOpacity>
+        )}
+        onDayPress={(day) => handleDayPress(day)}
+        refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        renderEmptyData={() => {
+          return (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{
+                  marginVertical: 30,
+                  marginHorizontal: 50,
+                  fontWeight: "600",
+                  fontSize: 18,
+                }}
+              > {Object.keys(items).length === 0 && (
+    <Text>No data available</Text>
+  )}
+              </Text>
+            </View>
+          );
+        }}
       />
-      {loading && (
-        <ActivityIndicator
-          size="large"
-          style={{ position: 'absolute', top: '50%', left: '50%', transform: [{ translateX: -25 }, { translateY: -25 }] }}
-        />
-      )}
-
-        <View style={{ marginTop: 40, marginBottom: 150 }}>
-          <View style={{ flexDirection: "row" }}>
-            <View style={styles.greenBox}></View>
-            <Text
-              style={{
-                textAlign: "center",
-                fontSize: 16,
-                marginRight: 10,
-                marginLeft: 10,
-              }}
-            >
-              Occupied//Checked In
-            </Text>
-            <View style={styles.redBox}></View>
-            <Text
-              style={{
-                textAlign: "center",
-                fontSize: 16,
-                marginRight: 10,
-                marginLeft: 10,
-              }}
-            >
-              Cancelled
-            </Text>
-          </View>
-          <View style={{ flexDirection: "row" }}>
-            <View style={styles.bllueBox}></View>
-            <Text
-              style={{
-                textAlign: "center",
-                fontSize: 16,
-                marginRight: 10,
-                marginLeft: 10,
-              }}
-            >
-              Reserved
-            </Text>
-            <View style={styles.redBox}></View>
-            <Text
-              style={{
-                textAlign: "center",
-                fontSize: 16,
-                marginRight: 10,
-                marginLeft: 10,
-              }}
-            >
-              Checked Out
-            </Text>
-          </View>
-        </View>
-      </ScrollView>
-      <View style={styles.table}>
-        {/* Row 1 */}
-        <View style={styles.row}>
-          <View style={styles.cell2}>
-            <Text style={styles.text}>Available Room</Text>
-          </View>
-          <View style={styles.separator}></View>
-          <View style={styles.cell}>
-            <Text style={styles.text}> 2</Text>
-          </View>
-          <View style={styles.separator}></View>
-          <View style={styles.cell}>
-            <Text style={styles.text}> 3</Text>
-          </View>
-          <View style={styles.separator}></View>
-          <View style={styles.cell}>
-            <Text style={styles.text}> 4</Text>
-          </View>
-          <View style={styles.separator}></View>
-          <View style={styles.cell}>
-            <Text style={styles.text}> 5</Text>
-          </View>
-          <View style={styles.separator}></View>
-          <View style={styles.cell}>
-            <Text style={styles.text}> 6</Text>
-          </View>
-        </View>
-
-        {/* Row 2 */}
-        <View style={styles.row}>
-          <View style={styles.cell2}>
-            <Text style={styles.text}>Occupancy</Text>
-          </View>
-          <View style={styles.separator}></View>
-          <View style={styles.cell}>
-            <Text style={styles.text}> 2</Text>
-          </View>
-          <View style={styles.separator}></View>
-          <View style={styles.cell}>
-            <Text style={styles.text}> 3</Text>
-          </View>
-          <View style={styles.separator}></View>
-          <View style={styles.cell}>
-            <Text style={styles.text}> 4</Text>
-          </View>
-          <View style={styles.separator}></View>
-          <View style={styles.cell}>
-            <Text style={styles.text}> 5</Text>
-          </View>
-          <View style={styles.separator}></View>
-          <View style={styles.cell}>
-            <Text style={styles.text}> 6</Text>
-          </View>
-        </View>
-      </View>
-      {exitAlertVisible && showExitAlert()}
+      <View style={{ marginBottom: 0 }}></View>
+      <CollapsibleCard content={available} />
+      {/* {exitAlertVisible && showExitAlert()} */}
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
@@ -574,9 +541,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
     marginBottom: 5,
+    color: "white",
   },
   roomId: {
-    color: "#555",
+    color: "white",
+    // fontWeight: "bold",
+  },
+  emptyDateContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyDateText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "black",
   },
 });
 

@@ -10,7 +10,6 @@ import {
   ScrollView,
   Alert,
   TextInput,
-  Linking,
 } from "react-native";
 import axios from "axios";
 import DatePickerComp from "../components/DateTimePicker";
@@ -26,9 +25,8 @@ import OtherGuestCard from "../components/OtherGuestCard";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
 import DropDownPicker from "react-native-dropdown-picker";
-import * as FileSystem from 'expo-file-system';
 
-const CheckInDetailsScreen = (items) => {
+const ReservedDetailsScreen = (items) => {
   const currDate = new Date().toISOString().slice(0, 10);
   const navigation = useNavigation();
   // const [selectedDate, setSelectedDate] = useState(currDate);
@@ -36,11 +34,11 @@ const CheckInDetailsScreen = (items) => {
   const [checkIns, setCheckIns] = useState([]);
   const [bookingData, setBookingData] = useState([]);
   const [lastDate, setLastDate] = useState();
-  const [payment, SetPayment] = useState();
   const data = items?.route?.params?.checkInDatas;
   const hotelCode = items?.route?.params?.hotelCode;
-
+  const [isCheckIn, setIsCheckIn] = useState(false);
   const fetchData = async () => {
+    const bookingStatus = isCheckIn ? "check_in" : "cancelled";
     const apiUrl = "https://api.ratebotai.com:8443/change_info_for_check_in";
     const Mockdata = {
       allowance: bookingData?.allowance,
@@ -48,7 +46,7 @@ const CheckInDetailsScreen = (items) => {
       balance_amount: bookingData?.balance_amount,
       booking_from: bookingData?.booking_from,
       booking_id: bookingData?.booking_id,
-      booking_status: "check_out",
+      booking_status: "check_in",
       charge_till_now: bookingData?.charge_till_now,
       corporate: bookingData?.corporate,
       corporate_id: bookingData?.corporate_id,
@@ -64,7 +62,7 @@ const CheckInDetailsScreen = (items) => {
       email: bookingData?.email,
       extra_charges: bookingData?.extra_charges,
       first_name: bookingData?.first_name,
-      from_date: bookingData?.from_date,
+      from_date:currDate,
       gross_amount: bookingData?.gross_amount,
       gross_amount_new: bookingData?.gross_amount_new,
       guest_data: bookingData?.guest_data,
@@ -98,7 +96,7 @@ const CheckInDetailsScreen = (items) => {
       tax_amount_new: bookingData?.tax_amount_new,
       tax_value: bookingData?.tax_value,
       time_string: bookingData?.time_string,
-      to_date: currDate,
+      to_date: bookingData?.to_date,
       total_discount: bookingData?.total_discount,
       total_room_tarif: bookingData?.total_room_tarif,
       total_sale_amount: bookingData?.total_sale_amount,
@@ -118,69 +116,94 @@ const CheckInDetailsScreen = (items) => {
       console.error("Error fetching data:", error);
     }
   };
-
-
-  const downloadPdf = async (url, fileName) => {
-    // console.log('File downloaded successfully',url,fileName);
+  const fetchCancelData = async () => {
+    const bookingStatus = isCheckIn ? "check_in" : "cancelled";
+    const apiUrl = "https://api.ratebotai.com:8443/change_info_for_check_in";
+    const Mockdata = {
+      allowance: bookingData?.allowance,
+      balance: bookingData?.balance,
+      balance_amount: bookingData?.balance_amount,
+      booking_from: bookingData?.booking_from,
+      booking_id: bookingData?.booking_id,
+      booking_status: "cancelled",
+      charge_till_now: bookingData?.charge_till_now,
+      corporate: bookingData?.corporate,
+      corporate_id: bookingData?.corporate_id,
+      coupon_value: bookingData?.coupon_value,
+      created_date: bookingData?.created_date,
+      created_datetime: bookingData?.created_datetime,
+      created_time: bookingData?.created_time,
+      current_date: bookingData?.current_date,
+      customer_id: bookingData?.customer_id,
+      discount_type: bookingData?.discount_type,
+      discount_type_value: bookingData?.discount_type_value,
+      discount_value: bookingData?.discount_value,
+      email: bookingData?.email,
+      extra_charges: bookingData?.extra_charges,
+      first_name: bookingData?.first_name,
+      from_date:currDate,
+      gross_amount: bookingData?.gross_amount,
+      gross_amount_new: bookingData?.gross_amount_new,
+      guest_data: bookingData?.guest_data,
+      hotel_id: bookingData?.hotel_id,
+      hotel_name: bookingData?.hotel_name,
+      last_name: bookingData?.last_name,
+      max_amount: bookingData?.max_amount,
+      minimum_advance: bookingData?.minimum_advance,
+      mobile_number: bookingData?.mobile_number,
+      nights: bookingData?.nights,
+      no_of_adults: bookingData?.no_of_adults,
+      no_of_children: bookingData?.no_of_children,
+      no_of_nights: bookingData?.no_of_nights,
+      no_of_pax: bookingData?.no_of_pax,
+      no_of_rooms: bookingData?.no_of_rooms,
+      one_day_room_tariff: bookingData?.one_day_room_tariff,
+      other_members: bookingData?.other_members,
+      paid_amount: bookingData?.paid_amount,
+      payment_details: bookingData?.payment_details,
+      payment_list: bookingData?.payment_list,
+      payment_modes: bookingData?.payment_modes,
+      phone_number: bookingData?.phone_number,
+      rate_amount: bookingData?.rate_amount,
+      refund: bookingData?.refund,
+      rete_plan_name: bookingData?.rete_plan_name,
+      room_type_id: bookingData?.room_booking[0]?.room_type_id,
+      room_booking: bookingData?.room_booking,
+      service_amount: bookingData?.service_amount,
+      service_charge: bookingData?.service_charge,
+      tax_amount: bookingData?.tax_amount,
+      tax_amount_new: bookingData?.tax_amount_new,
+      tax_value: bookingData?.tax_value,
+      time_string: bookingData?.time_string,
+      to_date: bookingData?.to_date,
+      total_discount: bookingData?.total_discount,
+      total_room_tarif: bookingData?.total_room_tarif,
+      total_sale_amount: bookingData?.total_sale_amount,
+      total_services_amount: bookingData?.total_services_amount,
+      total_without_tax: bookingData?.total_without_tax,
+      travel_agent: bookingData?.travel_agent,
+      travel_agent_id: bookingData?.travel_agent_id,
+      update_date: bookingData?.update_date,
+      update_time: bookingData?.update_time,
+    };
+    console.log(Mockdata, "mockkkk");
     try {
-      const { uri } = await FileSystem.downloadAsync(url, FileSystem.documentDirectory + fileName + '.pdf');
-      //  Alert.alert('File downloaded successfully', String(uri));
-       Alert.alert(
-        "Alert",
-        'Click OPEN to Download Invoice',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-          {
-            text: 'Open',
-            onPress: async () => {
-              Linking.openURL(url)
-            }
-          },
-        ]
-      );
+      const response = await axios.post(apiUrl, Mockdata);
+      setCheckIns(response?.data);
+      console.log(response.data.data);
     } catch (error) {
-      console.error('Error downloading file:', error);
+      console.error("Error fetching data:", error);
     }
   };
-
-  
-  const handleDownload = async (bookingId,customer_id) => {
-    const apiUrl = `https://api.ratebotai.com:8443/invoice_pms?booking_id=${bookingId}&customer_id=${customer_id}`;
-    try {
-      const response = await fetch(apiUrl);
-      const data = await response.json();
-      console.log(response,data,"datatatatatatatat")
-      if (data && data.file) {
-        const { file, invoice_number } = data;
-        downloadPdf(file, `invoice_${invoice_number}`,);
-      } else {
-        Alert.alert("Alert","Error Downloading",
-        [
-          {
-            text: "OK",
-             onPress: () =>navigation.navigate('Home'),
-          },
-        ],)
-      }
-    } catch (error) {
-      console.error('Error fetching API:', error);
-    }
-  };
-
-
-
   useEffect(() => {
     if (checkIns?.status === 200 && checkIns?.data) {
       Alert.alert(
-         checkIns?.message,
-         "Click Ok to download Invoice...!!!!",
+        "Alert",
+        checkIns?.message,
         [
           {
             text: "OK",
-             onPress: () =>handleDownload(checkIns?.data?.booking_id,checkIns?.data?.customer_id),
+            onPress: () => navigation.navigate("Checked-In"),
           },
         ],
         { cancelable: false }
@@ -189,38 +212,26 @@ const CheckInDetailsScreen = (items) => {
   }, [checkIns]);
 
   const handleCheckIn = () => {
-    if (bookingData?.charge_till_now?.balance === 0) {
-      Alert.alert(
-        "Alert",
-        "Do You Want to Check Out ?",
-        [ {
+    Alert.alert(
+      "Confirm",
+      "Are you sure you want to check in?",
+      [
+        {
           text: "Cancel",
           style: "cancel",
         },
-          {
-            text: "OK",
-            onPress: () => fetchData(),
+        {
+          text: "OK",
+          onPress: () => {
+            setIsCheckIn(true);
+            fetchData();
           },
-        ],
-        { cancelable: false }
-      );
-    } else
-      Alert.alert(
-        "Payment is Pending...!!!",
-        "Do U Want to Continue. ?",
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-          {
-            text: "OK",
-             onPress: () => handleAddGuest(),
-          },
-        ],
-        { cancelable: false }
-      );
+        },
+      ],
+      { cancelable: false }
+    );
   };
+  
 
   const fetchDataa = async () => {
     const apiUrl = "https://api.ratebotai.com:8443/get_booking_data_pms";
@@ -279,116 +290,77 @@ const CheckInDetailsScreen = (items) => {
   };
 
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("Cash");
+  const [value, setValue] = useState("Male");
   const [item, setItems] = useState([
-    { label: "Cash", value: "Cash" },
-    { label: "Card", value: "Card" },
-    { label: "Upi", value: "Upi" },
+    { label: "Male", value: "Male" },
+    { label: "Female", value: "Female" },
   ]);
+
   const [formData, setFormData] = useState({
-    amount:bookingData?.charge_till_now?.balance.toString(),
-    receipt:'',
-    desc:'',
-    mode:value,
+    address: "",
+    booked_guest_id: bookingData?.customer_id,
+    date_of_birth: "",
+    extra_guest_id: "",
+    first_name: "",
+    id_number: "",
+    id_type: "",
+    last_name: "",
+    phone_number: "",
+    gender: "",
   });
-  console.log(formData,value,"formdata")
-  useEffect(() => {
-    setFormData((prevData) => ({
-      ...prevData,
-      amount: bookingData?.charge_till_now?.balance?.toString(),
-    }));
-  }, [bookingData]);
-  // const handleInputChange = (key, value) => {
-  //   setFormData({
-  //     ...formData,
-  //     [key]: value,
-  //   });
-  // };
-  const handleInputChangeValue = (key, value) => {
+  const handleInputChange = (key, value) => {
     setFormData({
       ...formData,
       [key]: value,
     });
   };
+  const handleSave = () => {
+    const updatedPaymentList = bookingData?.other_members.concat({
+      first_name: formData.first_name,
+      gender: value,
+      address: formData.address,
+      booked_guest_id: 1166,
+      date_of_birth: formData.date_of_birth,
+      extra_guest_id: formData.extra_guest_id,
+      id_number: formData.id_number,
+      id_type: formData.id_type,
+      last_name: formData.last_name,
+      phone_number: formData.phone_number,
+    });
 
+    // Update bookingData with the new payment list
+    setBookingData({
+      ...bookingData,
+      other_members: updatedPaymentList,
+    });
 
-  const handleSave = async () => {
-    const { amount, receipt, desc } = formData;
-    let amountByMode = 0;
-    switch (value) {
-      case 'Cash':
-        amountByMode = amount;
-        break;
-      case 'Card':
-        amountByMode = amount; // Replace cardAmount with the actual value for card payment
-        break;
-      case 'Upi':
-        amountByMode = amount; // Replace upiAmount with the actual value for UPI payment
-        break;
-      default:
-        break;
-    }
-    try {
-      const dataToSend = {
-        booking_id: bookingData?.booking_id,
-        paid_amount: formData.amount,
-        gross_amount: bookingData?.gross_amount,
-        receipt_no: formData.receipt,
-        mode:value,
-        corporate_id: bookingData?.corporate_id,
-        travel_agent_id:bookingData?.travel_agent_id,
-        upi: value === 'Upi' ? amountByMode : 0,
-       card: value === 'Card' ? amountByMode : 0,
-        cash: value === 'Cash' ? amountByMode : 0,
-        amount:formData.amount,
-        available_balance: 0,
-        description:formData?.desc,
-        comment: "",
-      };
-      console.log(dataToSend,"senddd")
-  
-      // Show loading spinner while waiting for the API response
-      // You may need to manage loading state in your component
-      // setLoading(true);
-  
-      const response = await axios.post(
-        "https://api.ratebotai.com:8443/insert_payment_data",
-        dataToSend
-      );
-  
-      SetPayment(response?.data);
-  
-      // Close the modal
-      toggleModal();
-    } catch (error) {
-      console.error("Error saving payment:", error);
-      // Handle the error appropriately, show an error message, etc.
-      // You may also want to set an error state in your component
-    } finally {
-      // Hide loading spinner
-      // setLoading(false);
-    }
+    toggleModal(); // Close the modal
   };
+
   const handleAddGuest = () => {
     setModalVisible(true);
   };
-  useEffect(() => {
-    if (payment) {
-      Alert.alert(
-        "ALert",payment?.message,
-        [
-          {
-            text: "OK",
-             onPress: () => fetchDataa(),
+  const handleModify = () => {
+    Alert.alert(
+      "Confirm",
+      "Are you sure you want to cancel?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: () => {
+            setIsCheckIn(false);
+            fetchCancelData();
           },
-        ],
-        { cancelable: false }
-      );
-    }
-  }, [payment]);
-  // const handleModify = () => {
-  //   alert("hiiiiii33333");
-  // };
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+  
   // last_night_audit_last_date
   const isNextDay = (date1, date2) => {
     const nextDay = new Date(date2);
@@ -403,14 +375,14 @@ const CheckInDetailsScreen = (items) => {
   };
 
   // Function to handle date change in date picker
-  // const handleDateChange = (event, selectedDate) => {
-  //   if (selectedDate) {
-  //     setSelectedDate(selectedDate);
-  //     handleInputChange("date_of_birth", selectedDate.toISOString().slice(0, 10));
-  //   }
-  //   toggleDatePicker(); // Close the date picker
-  // };
-  console.log(payment,"dateee")
+  const handleDateChange = (event, selectedDate) => {
+    if (selectedDate) {
+      setSelectedDate(selectedDate);
+      handleInputChange("date_of_birth", selectedDate.toISOString().slice(0, 10));
+    }
+    toggleDatePicker(); // Close the date picker
+  };
+  console.log(data,checkIns,"dateee")
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -454,7 +426,7 @@ const CheckInDetailsScreen = (items) => {
         </TouchableOpacity> */}
 
         {/* ================================================================================================== */}
-        {/* {data?.from_date && lastDate && isNextDay(data.from_date, lastDate) ? (
+        {data?.from_date && lastDate && isNextDay(data.from_date, lastDate) ? (
         <TouchableOpacity onPress={handleAddGuest}>
             <View style={styles.containerGuest}>
               <FontAwesome name="plus" size={20} color="black" />
@@ -479,44 +451,28 @@ const CheckInDetailsScreen = (items) => {
               </Text>
         </View>
         </TouchableOpacity>
-        )} */}
+        )}
         {/* =================================================================================== */}
 
         <Modal isVisible={isModalVisible}>
           <View style={styles.modalContainer}>
             <Text style={{ fontSize: 18, marginBottom: 10 }}>
-              Pending Payment
+              Guest Information
             </Text>
-            <DropDownPicker
-              open={open}
-              value={value}
-              items={item}
-              setOpen={setOpen}
-              setValue={setValue}
-              setItems={setItems}
-              placeholder="Select Payment Method"
-            />
+
             <TextInput
-              style={[styles.input, { fontWeight: 'bold',fontSize:18,color:'black' }]}
-              editable={false}
-              placeholder="Amount"
-              keyboardType="number-pad"
-              value={`₹ ${bookingData?.charge_till_now?.balance?.toString() || ''}`}
-              onChangeText={(text) => handleInputChangeValue("amount", text)}
+              style={styles.input}
+              placeholder="First Name"
+              value={formData.first_name}
+              onChangeText={(text) => handleInputChange("first_name", text)}
             />
             <TextInput
               style={styles.input}
-              placeholder="Receipt No"
-              value={formData.receipt}
-              onChangeText={(text) => handleInputChangeValue("receipt", text)}
+              placeholder="Last Name"
+              value={formData.last_name}
+              onChangeText={(text) => handleInputChange("last_name", text)}
             />
-             <TextInput
-              style={styles.input}
-              placeholder="Description"
-              value={formData.desc}
-              onChangeText={(text) => handleInputChangeValue("desc", text)}
-            />
-            {/* <TouchableOpacity  style={styles.datePickerContainer} onPress={toggleDatePicker}>
+            <TouchableOpacity  style={styles.datePickerContainer} onPress={toggleDatePicker}>
         <TextInput
           style={styles.input}
           placeholder="Date Of Birth"
@@ -525,8 +481,8 @@ const CheckInDetailsScreen = (items) => {
           onTouchStart={toggleDatePicker}
         />
         <FontAwesome name="calendar" size={20} color="gray" style={styles.calendarIcon} />
-      </TouchableOpacity> */}
-      {/* {isDatePickerVisible && (
+      </TouchableOpacity>
+      {isDatePickerVisible && (
         <DateTimePicker
           testID="dateTimePicker"
           value={selectedDate}
@@ -535,23 +491,33 @@ const CheckInDetailsScreen = (items) => {
           display="default"
           onChange={handleDateChange}
         />
-      )} */}
+      )}
 
 
-            {/* <TextInput
+            <TextInput
               style={styles.input}
               keyboardType="number-pad"
               placeholder="Phone no."
               value={formData.phone_number}
               onChangeText={(text) => handleInputChange("phone_number", text)}
-            /> */}
-            {/* <TextInput
+            />
+            <TextInput
               style={styles.input}
               placeholder="Address"
               value={formData.address}
               onChangeText={(text) => handleInputChange("address", text)}
-            /> */}
-            {/* <TextInput
+            />
+            <DropDownPicker
+              open={open}
+              value={value}
+              items={item}
+              setOpen={setOpen}
+              setValue={setValue}
+              setItems={setItems}
+              placeholder="Select Gender"
+            />
+
+            <TextInput
               style={styles.input}
               placeholder="Id Type"
               value={formData.id_type}
@@ -562,7 +528,7 @@ const CheckInDetailsScreen = (items) => {
               placeholder="Id no."
               value={formData.id_number}
               onChangeText={(text) => handleInputChange("id_number", text)}
-            /> */}
+            />
             <View
               style={{ flexDirection: "row", justifyContent: "space-around" }}
             >
@@ -592,7 +558,7 @@ const CheckInDetailsScreen = (items) => {
                 }}
               >
                 <Text style={[styles.optionText, { textAlign: "center" }]}>
-                  Pay
+                  Save
                 </Text>
               </TouchableOpacity>
             </View>
@@ -626,29 +592,29 @@ const CheckInDetailsScreen = (items) => {
             <Text style={{fontSize:15,fontWeight:"600"}}>{bookingData?.charge_till_now?.balance}</Text>
           </View>
         </View>
-        {bookingData?.booking_status === "check_in" ? (
+        {/* {data?.from_date && lastDate && isNextDay(data.from_date, lastDate) ? ( */}
           <View style={styles.bottomButtonsContainer}>
             <TouchableOpacity
+            style={styles.buttonCancel}
+            onPress={() => handleModify()}
+          >
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+          {data?.from_date && lastDate && isNextDay(data.from_date, lastDate) &&(
+          <TouchableOpacity
               style={styles.button}
               onPress={() => handleCheckIn()}
             >
-               <Text style={styles.buttonText}>Check Out</Text>
-            </TouchableOpacity>
-
-            {/* <TouchableOpacity
-            style={styles.button}
-            onPress={() => handleModify()}
-          >
-            <Text style={styles.buttonText}>Modify</Text>
-          </TouchableOpacity> */}
+              <Text style={styles.buttonText}>Check In</Text>
+            </TouchableOpacity>)}
           </View>
-        ) : null}
+        {/* ) : null} */}
       </View>
     </ScrollView>
   );
 };
 
-export default CheckInDetailsScreen;
+export default ReservedDetailsScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -703,6 +669,12 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#007BFF",
+    paddingVertical: 15,
+    paddingHorizontal: "10%",
+    borderRadius: 5,
+  },
+  buttonCancel:{
+    backgroundColor: "red",
     paddingVertical: 15,
     paddingHorizontal: "10%",
     borderRadius: 5,

@@ -6,7 +6,8 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  Linking
+  Linking,
+  Image
 } from "react-native";
 import { FontAwesome5 } from '@expo/vector-icons';
 
@@ -31,7 +32,7 @@ const HelpScreen = () => {
         Linking.openURL(telUrl);
       };
       const handleWhatsApp = () => {
-        const phoneNumber = '08048039014'; // Replace with your WhatsApp number
+        const phoneNumber = '+918591975258'; // Replace with your WhatsApp number
         const whatsappUrl = `whatsapp://send?phone=${phoneNumber}`;
         Linking.openURL(whatsappUrl);
       };
@@ -69,7 +70,17 @@ const HelpScreen = () => {
             <FontAwesome5 name="whatsapp" size={30} color="#25D366" />
           </TouchableOpacity>
 
+
         </View>
+   
+  <View style={styles.container2}>
+      <Image
+        style={styles.stretch}
+        source={require('../assets/icon2.png')}
+      />
+    </View>
+
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -81,6 +92,17 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: "100%",
     height: "100%",
+  },
+  container2: {
+    paddingTop: 50,
+    justifyContent: 'center', alignItems: 'center'
+  },
+  stretch: {
+    width: '50%',
+    height:150,
+    resizeMode:'center',
+    borderRadius:10,
+    
   },
   heading: {
     backgroundColor: "#77C3EC",

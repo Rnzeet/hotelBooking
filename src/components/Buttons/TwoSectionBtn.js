@@ -10,7 +10,7 @@ const TwoSectionBtn = ({ callCheckInAPI, total, count, link, navigation, rooms, 
   const togglePreferenceModal = () => {
     setIsVisible(!isVisible);
   };
-console.log(callCheckInAPI, total, count, link, navigation, rooms, details, dates ,"dataaa")
+console.log(callCheckInAPI, total, count, link, navigation, rooms, details, dates ,"dataauua")
   const handleContinue = async () => {
     if (total === 0) {
       // Show an alert if total is 0
@@ -18,7 +18,7 @@ console.log(callCheckInAPI, total, count, link, navigation, rooms, details, date
       return;
     }
     if (link !== '' && total !=0) {
-      if (link === 'Single Edit') {
+      if (link === 'Reservation Detail') {
         try {
           const response = await callCheckInAPI();
           console.log(response.booking_id, 'response.status')
@@ -49,7 +49,7 @@ console.log(callCheckInAPI, total, count, link, navigation, rooms, details, date
           <View style={styles.count}>
             <Text style={{ fontWeight: 500 }}>{count}</Text>
           </View>
-          <Text style={{ fontWeight: 500, fontSize: 22, color: '#fff' }}>{`$ ${total}`}</Text>
+          <Text style={{ fontWeight: 500, fontSize: 22, color: '#fff' }}>{`₹ ${total}`}</Text>
           <TouchableOpacity>
             <FontAwesome style={{ marginTop: 3, color: '#FECD00' }} name="ellipsis-h" size={20} color="white" />
           </TouchableOpacity>

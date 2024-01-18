@@ -37,7 +37,7 @@ const NightAudit = () => {
     const [selectedDate, setSelectedDate] = useState(currDate);
     const [refreshing, setRefreshing] = React.useState(false);
 
-    const [apiData, setApiData] = useState(null);
+    const [apiData, setApiData] = useState({});
     // console.log(selectedDate, hotelCode)
 
 
@@ -49,7 +49,7 @@ const NightAudit = () => {
             const fetchData = async () => {
                 try {
                     const response = await fetchDataFromApi();
-                    setApiData(response.data);
+                    setApiData(response?.data || []);
                 } catch (error) {
                     console.error('Error fetching data:', error);
                 }
@@ -83,7 +83,7 @@ const NightAudit = () => {
             
             }
             const response = await axios.post('https://api.ratebotai.com:8443/perform_night_audit', dataToSend);
-            alert(response.data.message);
+            alert(response?.data?.message);
         } catch (error) {
             console.log(error);
             alert('Something went wrong');
@@ -95,7 +95,7 @@ const NightAudit = () => {
         const fetchData = async () => {
             try {
                 const response = await fetchDataFromApi();
-                setApiData(response.data);
+                setApiData(response?.data || []);
                 // console.log(response.data)
                 // console.log("first")
             } catch (error) {
@@ -135,29 +135,29 @@ const NightAudit = () => {
                 </View>
             </View>
             <ScrollView style={{ padding: 16, marginBottom: 10 }}>
-                {apiData ? (
+                {(apiData && apiData?.data) ? (
                     <View>
                         {/* Display account details */}
                         <View style={styles.section}>
                             <Text style={styles.sectionHeader}>Account Details</Text>
                             <Text>Default Counter:</Text>
-                            {apiData.data.account_details.default_counter.map((counter, index) => (
+                            {apiData?.data?.account_details?.default_counter?.map((counter, index) => (
                                 <View key={index} style={styles.item}>
                                     <View style={styles.labelRow}>
                                         <Text style={styles.label}>Status:</Text>
-                                        <Text>{counter.Status}</Text>
+                                        <Text>{counter?.Status}</Text>
                                     </View>
                                     <View style={styles.labelRow}>
                                         <Text style={styles.label}>Balance:</Text>
-                                        <Text>{counter.balance}</Text>
+                                        <Text>{counter?.balance}</Text>
                                     </View>
                                     <View style={styles.labelRow}>
                                         <Text style={styles.label}>Revenue Received:</Text>
-                                        <Text>{counter.revenue_received}</Text>
+                                        <Text>{counter?.revenue_received}</Text>
                                     </View>
                                     <View style={styles.labelRow}>
                                         <Text style={styles.label}>Withdrawals:</Text>
-                                        <Text>{counter.withdrawals}</Text>
+                                        <Text>{counter?.withdrawals}</Text>
                                     </View>
                                 </View>
                             ))}
@@ -165,15 +165,15 @@ const NightAudit = () => {
                             <View style={styles.item}>
                                 <View style={styles.labelRow}>
                                     <Text>Balance: </Text>
-                                    <Text>{apiData.data.account_details.total.balance}</Text>
+                                    <Text>{apiData?.data?.account_details?.total?.balance}</Text>
                                 </View>
                                 <View style={styles.labelRow}>
                                     <Text>Revenue Received: </Text>
-                                    <Text>{apiData.data.account_details.total.revenue_received}</Text>
+                                    <Text>{apiData?.data?.account_details?.total?.revenue_received}</Text>
                                 </View>
                                 <View style={styles.labelRow}>
                                     <Text>Withdrawals:</Text>
-                                    <Text>{apiData.data.account_details.total.withdrawals}</Text>
+                                    <Text>{apiData?.data?.account_details?.total?.withdrawals}</Text>
                                 </View>
                             </View>
                         </View>
@@ -181,7 +181,7 @@ const NightAudit = () => {
                         {/* Display booking revenue */}
                         <View style={styles.section}>
                             <Text style={styles.sectionHeader}>Booking Revenue</Text>
-                            {Object.entries(apiData.data.booking_revenue).map(([key, value]) => (
+                            {Object.entries(apiData?.data?.booking_revenue)?.map(([key, value]) => (
                                 <View key={key} style={styles.item}>
                                     <View style={styles.labelRow}>
                                         <Text style={styles.label}>{key}:</Text>
@@ -197,15 +197,15 @@ const NightAudit = () => {
                             <View style={styles.item}>
                                 <View style={styles.labelRow}>
                                     <Text style={styles.label}>Checked Out Rooms Marked Dirty: </Text>
-                                    <Text>{apiData.data.housekeeping_details.checked_out_rooms_marked_dirty}</Text>
+                                    <Text>{apiData?.data?.housekeeping_details?.checked_out_rooms_marked_dirty}</Text>
                                 </View>
                                 <View style={styles.labelRow}>
                                     <Text style={styles.label}>Occupied Rooms Marked for Dirty:</Text>
-                                    <Text> {apiData.data.housekeeping_details.occupied_rooms_marked_for_dirty}</Text>
+                                    <Text> {apiData?.data?.housekeeping_details?.occupied_rooms_marked_for_dirty}</Text>
                                 </View>
                                 <View style={styles.labelRow}>
                                     <Text style={styles.label}>Vacant Rooms Marked for Touchup:</Text>
-                                    <Text>{apiData.data.housekeeping_details.vacant_rooms_marked_for_touchup}</Text>
+                                    <Text>{apiData?.data?.housekeeping_details?.vacant_rooms_marked_for_touchup}</Text>
                                 </View>
 
                             </View>
@@ -214,7 +214,7 @@ const NightAudit = () => {
                         {/* Display revenue list */}
                         <View style={styles.section}>
                             <Text style={styles.sectionHeader}>Revenue List</Text>
-                            {Object.entries(apiData.data.revenue_list).map(([key, value]) => (
+                            {Object.entries(apiData?.data?.revenue_list)?.map(([key, value]) => (
                                 <View key={key} style={styles.item}>
                                     <View style={styles.labelRow}>
                                         <Text style={styles.label}>{key}:</Text>
@@ -227,17 +227,17 @@ const NightAudit = () => {
                         <View style={styles.section}>
                             <Text style={styles.sectionHeader}>Room Details</Text>
                             <View style={styles.barChartContainer}>
-                                {Object.entries(apiData.data.room_details).map(([key, value]) => (
+                                {Object.entries(apiData?.data?.room_details)?.map(([key, value]) => (
                                     <View key={key} style={styles.barChart}>
-                                        <Text style={styles.subSectionHeader}>{key.replaceAll('_', " ")}</Text>
+                                        <Text style={styles.subSectionHeader}>{key?.replaceAll('_', " ")}</Text>
                                         <BarChart
                                             horizontal
                                             data={{
                                                 labels: ["Rooms", "Guests"],
                                                 datasets: [{
                                                     data: [
-                                                        value.rooms ? value.rooms : 0,
-                                                        value.guest === "-" ? 0 : parseInt(value.guest),
+                                                        value?.rooms ? value?.rooms : 0,
+                                                        value?.guest === "-" ? 0 : parseInt(value?.guest),
                                                     ],
                                                 }],
                                             }}
@@ -263,7 +263,7 @@ const NightAudit = () => {
                         {/* Display room tax */}
                         <View style={[styles.section, { paddingBottom: 10, marginBottom: 10 }]}>
                             <Text style={styles.sectionHeader}>Room Tax</Text>
-                            {Object.entries(apiData.data.room_tax).map(([key, value]) => (
+                            {Object.entries(apiData?.data?.room_tax)?.map(([key, value]) => (
                                 <View key={key} style={styles.item}>
                                     <View style={styles.labelRow}>
                                         <Text style={styles.label}>{key}:</Text>

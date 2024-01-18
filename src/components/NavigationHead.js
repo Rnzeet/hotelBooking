@@ -23,8 +23,8 @@ const styles = StyleSheet.create({
     container:{
         
         flexDirection:"row",
-        alignItems:"center",
-        gap:100,
+        alignItems:"left",
+        gap:25,
         padding:15,
         backgroundColor:"#fff",
         borderBottomColor:"#000",

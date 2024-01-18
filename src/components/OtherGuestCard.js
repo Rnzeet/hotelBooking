@@ -40,7 +40,10 @@ const handleClick=()=>{
 console.log(checkInDatas?.other_members,"hotelllllllll44343434l")
   return (
     <>
-    <Text style={{marginTop:10 ,marginLeft:10}}>Other Members</Text>
+    <Text style={{marginTop:10 ,marginLeft:10,fontSize:16, backgroundColor:'#90EE90',
+            padding:5,
+            marginHorizontal:0,
+            borderRadius:5}}>Other Members</Text>
     {checkInDatas?.other_members?.length >0 && checkInDatas?.other_members?.map((item, index) => (
         <TouchableOpacity key={index} onPress={handleClick}>
           <View style={styles.container}>
@@ -69,7 +72,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 15,
     paddingRight:15,
-    backgroundColor:"#f0f8ff",
+    backgroundColor:"lightblue",
     marginTop:10,
     borderRadius:10,
     marginHorizontal:10

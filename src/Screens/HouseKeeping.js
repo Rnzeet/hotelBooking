@@ -136,7 +136,7 @@ const RoomAvailabilityScreen = () => {
             onPress={() => {openModal(item)}}
             style={styles.roomItem}
         >
-            <Text style={styles.roomName}>{item.room_name}</Text>
+            <Text style={styles.roomName}>   {item.room_name}</Text>
             <Text style={[styles.availability, { color: getAvailabilityColor(item.Availability) }]}>
                 {item.Availability}
             </Text>
@@ -253,14 +253,20 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#333', // Dark text color
         marginBottom: 8,
+        backgroundColor:'lightblue',
+        borderRadius:5,
     },
     availability: {
         fontSize: 18,
         color: '#4CAF50', // Green color for availability
         marginBottom: 8,
+        fontWeight:'600'
     },
     detailsContainer: {
         marginTop: 12, // Added margin at the top
+        backgroundColor:'lightgreen',
+        borderRadius:5,
+        padding:5
     },
     detailHeading: {
         fontSize: 16,

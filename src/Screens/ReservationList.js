@@ -1,68 +1,66 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Button, StyleSheet, RefreshControl } from 'react-native';
+import { View, Text, FlatList, StyleSheet, RefreshControl,BackHandler,Alert } from 'react-native';
 import axios from 'axios';
 import DatePickerComp from '../components/DateTimePicker';
 import { FontAwesome } from '@expo/vector-icons';
-import checkedInStatus, { checkedOutStatus } from '../constants/constants';
+import checkedInStatus from '../constants/constants';
 import CheckInCard from '../components/CheckInCard';
-import CheckOutCard from '../components/CheckOutCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import NavigationHead from '../components/NavigationHead';
+import { useNavigation, useFocusEffect, useIsFocused } from '@react-navigation/native';
+import ReservedCard from '../components/ReservedCard';
 
-const CheckOutList = () => {
+const ReservedList = () => {
+  const navigation = useNavigation();
   const [checkIns, setCheckIns] = useState([]);
   const [status, setStatus] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const currDate = new Date().toISOString().slice(0, 10);
-  const [selectedDate, setSelectedDate] = useState(currDate);
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
   const [hotelCode, setHotelCode] = useState('');
-  const navigation = useNavigation();
-  // Retrieve the data from AsyncStorage
-  AsyncStorage.getItem('userData')
-    .then((userDataString) => {
-      if (userDataString) {
-        // Convert the stored string back to an object (you can use JSON.parse)
-        const userData = JSON.parse(userDataString);
 
-      
-        setHotelCode(userData.hotel_code)
-        // console.log('User Data:', logoPath);
+  const fetchHotelCode = async () => {
+    try {
+      const userDataString = await AsyncStorage.getItem('userData');
+
+      if (userDataString) {
+        const userData = JSON.parse(userDataString);
+        setHotelCode(userData.hotel_code);
       } else {
         console.log('User data not found.');
       }
-    })
-    .catch((error) => {
+    } catch (error) {
       console.error('Error retrieving user data:', error);
-    });
+    }
+  };
 
   const fetchData = async () => {
     setRefreshing(true);
-    
 
-    const apiUrl ='https://api.ratebotai.com:8443/get_check_in_orders';
-
+    const apiUrl = 'https://api.ratebotai.com:8443/get_check_in_orders';
     const postData = {
       from_date: selectedDate,
       to_date: selectedDate,
       hotel_code: hotelCode,
     };
-
+console.log(postData,"dataaa")
     try {
       const response = await axios.post(apiUrl, postData);
-      const filteredCheckIns = response?.data?.data?.filter(
-        (booking) => booking.booking_status === 'check_out'
+      const filteredCheckIns = response.data.data.filter(
+        (booking) => booking.booking_status ==='pending'
       );
       setCheckIns(filteredCheckIns);
       setStatus(response.data.data);
     } catch (error) {
-      alert('Error fetching room types:', error);
+      console.error('Error fetching data:', error);
     }
 
     setRefreshing(false);
   };
 
-  const [refreshing, setRefreshing] = useState(false);
+  useEffect(() => {
+    fetchHotelCode();
+  }, []);
+
   useFocusEffect(
     React.useCallback(() => {
       // Ensure that fetchData is called only after hotelCode is fetched
@@ -71,30 +69,67 @@ const CheckOutList = () => {
       }
     }, [selectedDate, hotelCode])
   );
+
   const onRefresh = () => {
     fetchData();
   };
 
-  useEffect(() => {
-    if (selectedDate) {
-      fetchData();
-    }
-  }, [selectedDate]);
-  const filteredCheckIns = status.filter(
-    (booking) => booking.booking_status === 'check_in'
-  );
-  const filteredCheckOuts = status.filter(
-    (booking) => booking.booking_status === 'check_out'
-  );
-  const checked_outs = checkedOutStatus(status);
+  const checked_ins = checkedInStatus(checkIns);
+
   const handleBackPress = () => {
     navigation.navigate('Home');
   };
-   console.log(checkIns,"checkins")
+  const filteredCheckIns = status.filter(
+    (booking) => booking?.booking_status === 'check_in'
+  );
+  const filteredPending= status.filter(
+    (booking) => booking?.booking_status === 'pending'
+  );
+  const [exitAlertVisible, setExitAlertVisible] = useState(false);
+  const isFocused = useIsFocused();
+  const showExitAlert = () => {
+    Alert.alert(
+      "Exit App",
+      "Are you sure you want to exit?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => setExitAlertVisible(false),
+          style: "cancel",
+        },
+        { text: "OK", onPress: () => BackHandler.exitApp() },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  useEffect(() => {
+    const handleBackPress = () => {
+      if (isFocused) {
+        // Check if you are on the first tab ("TapeChart")
+        const parentNavigator = navigation.getParent(); // Use dangerouslyGetParent
+        if (parentNavigator && parentNavigator.getState().index === 0) {
+          // If on the first tab, exit the app
+          setExitAlertVisible(true);
+          return true;
+        }
+      }
+
+      // If not on the first tab or not focused, let the default back behavior happen
+      return false;
+    };
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress
+    );
+
+    return () => backHandler.remove();
+    setExitAlertVisible(false);
+  }, [isFocused, navigation]);
   return (
     <View style={styles.container}>
-      {/* <NavigationHead
-      heading="Check Out"
+       {/* <NavigationHead
+      heading="Check In"
       onBackPress={handleBackPress}  
     /> */}
       <View style={styles.header}>
@@ -106,29 +141,29 @@ const CheckOutList = () => {
         <FontAwesome name="angle-right" size={44} color="white" />
         <View style={styles.count}>
           <Text style={{ alignItems: 'center', fontWeight: 'bold', fontSize: 20 }}>
-            {checkIns?.length}
+            {checkIns.length}
           </Text>
         </View>
       </View>
       <View style={styles.header2}>
         <View style={styles.check}>
           <View style={styles.count2}>
-            <Text style={{ alignItems: 'center', fontWeight: 'bold', color: "white", fontSize: 20 }}>
-              {filteredCheckOuts?.length}
-            </Text>
-          </View>
-          <Text style={{ alignItems: 'center', fontWeight: 'bold', fontSize: 17, marginTop: 12, color: 'white' }}>
-            CHECKED-OUT
-          </Text>
-        </View>
-        <View style={styles.check}>
-          <View style={styles.count2}>
-            <Text style={{ alignItems: 'center', fontWeight: 'bold', color: "white", fontSize: 20 }}>
-              {filteredCheckIns?.length}
+            <Text style={{ alignItems: 'center', fontWeight: 'bold', color: 'white', fontSize: 20 }}>
+              {filteredCheckIns?.length}  
             </Text>
           </View>
           <Text style={{ alignItems: 'center', fontWeight: 'bold', fontSize: 17, marginTop: 12, color: 'white' }}>
             CHECK-IN
+          </Text>
+        </View>
+        <View style={styles.check}>
+          <View style={styles.count2}>
+            <Text style={{ alignItems: 'center', fontWeight: 'bold', color: 'white', fontSize: 20 }}>
+              {filteredPending?.length}
+            </Text>
+          </View>
+          <Text style={{ alignItems: 'center', fontWeight: 'bold', fontSize: 17, marginTop: 12, color: 'white' }}>
+            CONFRIMED
           </Text>
         </View>
       </View>
@@ -139,26 +174,28 @@ const CheckOutList = () => {
       </View>:("")}
       <FlatList
         data={checkIns}
-        keyExtractor={(item, idx) => "COUT" + idx.toString() + item?.guest_id.toString()}
+        keyExtractor={(item) => item.booking_id.toString()}
         renderItem={({ item }) => (
-          <View style={[styles.card, { backgroundColor: item?.booking_status === 'check_out' ? '#FFDADA' : 'lightblue',marginHorizontal:10 }]}>
-            <CheckOutCard checkOutDatas={item} />
+          <View style={[styles.card, { backgroundColor:'lightblue',marginHorizontal:10 }]}>
+            <ReservedCard checkInDatas={item} />
           </View>
         )}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       />
+      {exitAlertVisible && showExitAlert()}
     </View>
   );
 };
 
-export default CheckOutList;
+export default ReservedList;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7f7',
+    // backgroundColor: 'lightblue',
+    // marginTop:30,
     padding: 1,
   },
   header: {
@@ -166,8 +203,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    // paddingVertical: 10,
     borderBottomWidth: 1,
+    paddingVertical:-25,
     borderBottomColor: '#ccc',
     backgroundColor: '#0186C1',
     paddingHorizontal: 10,
@@ -177,11 +214,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-     paddingVertical: -10,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     paddingHorizontal: 10,
     backgroundColor: '#027DB1',
+    paddingVertical:-25,
   },
   count: {
     backgroundColor: '#FECD00',
@@ -211,7 +249,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: 'lightblue',
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
@@ -222,5 +260,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignContent: 'center',
-  }
+  },
 });

@@ -7,8 +7,8 @@ import {
   RefreshControl,
   Dimensions,
 } from "react-native";
-import { BarChart } from "react-native-chart-kit";
-
+ import { BarChart } from "react-native-chart-kit";
+// import { BarChart } from 'react-native-charts-wrapper'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DatePickerComp from "../components/DateTimePicker";
 import axios from "axios";
@@ -35,7 +35,7 @@ const DashboardScreen = () => {
   );
   const [selectedLastDate, setSelectedLastDate] = useState(currDate);
   const [refreshing, setRefreshing] = React.useState(false);
-  const [apiData, setApiData] = useState(null);
+  const [apiData, setApiData] = useState([]);
   const [checkIns, setCheckIns] = useState([]);
   const [available, setAvailable] = useState([]);
   const [error, setError] = useState();
@@ -81,7 +81,7 @@ const DashboardScreen = () => {
     try {
       const response = await axios.post(apiUrl, postData);
       setAvailable(response?.data?.data);
-      console.log(response.data.data);
+      // console.log(response.data.data);
     } catch (error) {
       console.error("Error fetching data:", error);
       setRevError(error);
@@ -104,7 +104,7 @@ const DashboardScreen = () => {
     try {
       const response = await axios.post(apiUrl, postData);
       setCheckIns(response?.data);
-      console.log(response.data.data);
+      // console.log(response.data.data);
     } catch (error) {
       console.error("Error fetching data:", error);
       setRevError(error);
@@ -127,7 +127,7 @@ const DashboardScreen = () => {
     try {
       const response = await axios.post(apiUrl, dataToSend);
       setApiData(response?.data?.data);
-      console.log(response.data.data);
+      // console.log(response.data.data);
     } catch (error) {
       console.error("Error fetching data:", error);
       setError(error);
@@ -191,7 +191,7 @@ const DashboardScreen = () => {
   useEffect(() => {
     // Update filtered data when dateData or value changes
     const filteredData = apiData?.filter(
-      (dayData) => dayData.date === dateData[value]?.label
+      (dayData) => dayData?.date === dateData[value]?.label
     );
     setFilteredApiData(filteredData);
   }, [dateData, value, apiData]);
@@ -211,7 +211,7 @@ const DashboardScreen = () => {
   useEffect(() => {
     // Update filtered data when dateData or value changes
     const filteredData = available?.filter(
-      (dayData) => dayData.date === graphData[datevalue]?.label
+      (dayData) => dayData?.date === graphData[datevalue]?.label
     );
     setFilteredGraphApiData(filteredData);
   }, [graphData, datevalue, available]);
@@ -220,21 +220,21 @@ const DashboardScreen = () => {
 
   useEffect(() => {
     if (filteredGraphApiData && filteredGraphApiData?.length > 0) {
-      const chartData = filteredGraphApiData.map((entry) => ({
-        date: entry.date,
-        data: entry.data.map((room) => ({
-          room_type_name: room.room_type_name.trim().split(" ")[0],
-          total_rooms_booked: room.total_rooms_booked,
-          available_rooms: room.available_rooms,   
-          total_rooms: room.total_rooms,
+      const chartData = filteredGraphApiData?.map((entry) => ({
+        date: entry?.date,
+        data: entry?.data?.map((room) => ({
+          room_type_name: room?.room_type_name?.trim()?.split(" ")[0],
+          total_rooms_booked: room?.total_rooms_booked,
+          available_rooms: room?.available_rooms,   
+          total_rooms: room?.total_rooms,
          
         })),
       }));
-      setBarChartData(chartData);
+      setBarChartData(chartData || []);
     }
   }, [available]);
 
-  console.log(barChartData[0]?.data?.[0]?.booked_rooms, "datttaa");
+  console.log(apiData, "datttaa");
  useEffect(()=>{
 if(selectedDate>selectedLastDate){
   alert("Starting date cannot be greater then End date")
@@ -305,7 +305,7 @@ if(selectedDate>selectedLastDate){
               // searchPlaceholder="Search..."
               value={value}
               onChange={(item) => {
-                setValue(item.value);
+                setValue(item?.value);
               }}
             />
             {filteredApiData?.map((dayData, index) => (
@@ -315,7 +315,7 @@ if(selectedDate>selectedLastDate){
                   <View key={roomIndex} style={styles.item}>
                     <View style={styles.labelRow}>
                       <Text style={styles.label}>{room?.room_type_name}:</Text>
-                      <Text>Sold Stock: {room.sold_stock}</Text>
+                      <Text>Sold Stock: {room?.sold_stock}</Text>
                     </View>
                   </View>
                 ))}
@@ -349,19 +349,19 @@ if(selectedDate>selectedLastDate){
               // searchPlaceholder="Search..."
               value={datevalue}
               onChange={(item) => {
-                setDateValue(item.value);
+                setDateValue(item?.value);
               }}
             />
             {filteredGraphApiData?.map((chartEntry, index) => (
-              <View key={index}>
+              <View key={index} >
                 <Text style={{}}>Available Room</Text>
                 <BarChart
                   style={styles.chartStyle}
                   data={{
-                    labels: chartEntry.data.map((room) => {
+                    labels: chartEntry?.data?.map((room) => {
                       // (room) => `${room.room_type_name}`
-                          const bookedRooms = room.room_type_name; // Set a default value if booked_rooms is undefined
-                          return bookedRooms.trim().split(/\s+/)[0];
+                          const bookedRooms = room?.room_type_name; // Set a default value if booked_rooms is undefined
+                          return bookedRooms?.trim()?.split(/\s+/)[0];
                         }
                     ), // Include total rooms in the labels
                     // labels:
@@ -373,14 +373,14 @@ if(selectedDate>selectedLastDate){
                     datasets: [
                       {
                         // data: chartEntry.data.map((room) => room.booked_rooms),
-                        data: chartEntry.data.map((room) => {
-                          const bookedRooms = room.available_rooms; // Set a default value if booked_rooms is undefined
+                        data: chartEntry?.data?.map((room) => {
+                          const bookedRooms = room?.available_rooms; // Set a default value if booked_rooms is undefined
                           return bookedRooms;
                         }),
                       },
                     ],
                   }}
-                  width={screenWidth - 30} // Use screenWidth from the library or your own calculation
+                  width={screenWidth - 10} // Use screenWidth from the library or your own calculation
                   height={300}
                   yAxisLabel=""
                   xAxisSuffix=""
@@ -428,21 +428,21 @@ if(selectedDate>selectedLastDate){
                     // labels: chartEntry.data.map(
                     //   (room) => `${room.room_type_name}`
                     // ), // Include total rooms in the labels
-                    labels: chartEntry.data.map((room) => {
+                    labels: chartEntry?.data?.map((room) => {
                       // (room) => `${room.room_type_name}`
-                          const bookedRooms = room.room_type_name; // Set a default value if booked_rooms is undefined
-                          return bookedRooms.trim().split(/\s+/)[0];
+                          const bookedRooms = room?.room_type_name; // Set a default value if booked_rooms is undefined
+                          return bookedRooms?.trim()?.split(/\s+/)[0] ||[];
                         }
                     ), 
                     datasets: [
                       {
-                        data:chartEntry.data.map((room) => {
-                          const booked= room.total_rooms_booked; // Set a default value if booked_rooms is undefined
+                        data:chartEntry?.data?.map((room) => {
+                          const booked= room?.total_rooms_booked; // Set a default value if booked_rooms is undefined
                           return booked ||[];
                       })}
                     ],
                   }}
-                  width={screenWidth - 30} // Use screenWidth from the library or your own calculation
+                  width={screenWidth - 10} // Use screenWidth from the library or your own calculation
                   height={300}
                   yAxisLabel=""
                   xAxisSuffix=""
@@ -509,6 +509,7 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     borderRadius: 16,
     marginLeft: -45,
+    marginRight: -20
   },
   header: {
     width: "100%",
@@ -524,7 +525,7 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 16,
-    backgroundColor: "#fff", // White background
+    backgroundColor: "white", // White background
     padding: 16,
     borderRadius: 8,
     elevation: 3, // Android shadow

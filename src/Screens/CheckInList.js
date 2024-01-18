@@ -45,7 +45,7 @@ console.log(postData,"dataaa")
     try {
       const response = await axios.post(apiUrl, postData);
       const filteredCheckIns = response.data.data.filter(
-        (booking) => booking.booking_status ==='pending'
+        (booking) => booking.booking_status ==='check_in'
       );
       setCheckIns(filteredCheckIns);
       setStatus(response.data.data);
@@ -108,7 +108,7 @@ console.log(postData,"dataaa")
         <View style={styles.check}>
           <View style={styles.count2}>
             <Text style={{ alignItems: 'center', fontWeight: 'bold', color: 'white', fontSize: 20 }}>
-              {filteredCheckIns?.length}
+              {filteredCheckIns?.length}  
             </Text>
           </View>
           <Text style={{ alignItems: 'center', fontWeight: 'bold', fontSize: 17, marginTop: 12, color: 'white' }}>
@@ -122,7 +122,7 @@ console.log(postData,"dataaa")
             </Text>
           </View>
           <Text style={{ alignItems: 'center', fontWeight: 'bold', fontSize: 17, marginTop: 12, color: 'white' }}>
-            PENDING
+            CONFIRMED
           </Text>
         </View>
       </View>
@@ -135,7 +135,7 @@ console.log(postData,"dataaa")
         data={checkIns}
         keyExtractor={(item) => item.booking_id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor:'lightblue',marginHorizontal:10 }]}>
             <CheckInCard checkInDatas={item} />
           </View>
         )}
@@ -152,7 +152,7 @@ export default CheckInList;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7f7',
+    // backgroundColor: 'lightblue',
     // marginTop:30,
     padding: 1,
   },
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: 'lightblue',
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,

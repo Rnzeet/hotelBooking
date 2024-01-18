@@ -23,6 +23,7 @@ import CheckOutCard from "../components/CheckOutCard";
 import * as FileSystem from 'expo-file-system';
 import GuestCard from "../components/GuestCard";
 import OtherGuestCard from "../components/OtherGuestCard";
+import * as IntentLauncherAndroid from 'expo-intent-launcher';
 
 
 const CheckOutDetailsScreen = (items) => {
@@ -94,7 +95,7 @@ const CheckOutDetailsScreen = (items) => {
       tax_amount_new:bookingData?.tax_amount_new,
       tax_value: bookingData?.tax_value,
       time_string: bookingData?.time_string,
-      to_date:bookingData?.to_date,
+      to_date:currDate,
       total_discount: bookingData?.total_discount,
       total_room_tarif: bookingData?.total_room_tarif,
       total_sale_amount: bookingData?.total_sale_amount,
@@ -179,30 +180,45 @@ const CheckOutDetailsScreen = (items) => {
 
 
   const downloadPdf = async (url, fileName) => {
-    console.log(url,fileName,"fileeee")
+    // console.log('File downloaded successfully',url,fileName);
     try {
-   
       const { uri } = await FileSystem.downloadAsync(url, FileSystem.documentDirectory + fileName + '.pdf');
       console.log('File downloaded successfully');
-      console.log('File downloaded to:', uri);
+      //  Alert.alert('File downloaded successfully', String(uri));
+       Alert.alert(
+        "Alert",
+        'Click OPEN to Download Invoice',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Open',
+            onPress: async () => {
+              Linking.openURL(url)
+            }
+          },
+        ]
+      );
     } catch (error) {
       console.error('Error downloading file:', error);
     }
   };
 
   
-  const handleDownload = async () => {
-    const apiUrl = 'https://api.ratebotai.com:8443/invoice_pms?booking_id=9390&customer_id=805';
-
+  const handleDownload = async (bookingId,customer_id) => {
+    console.log(bookingId,customer_id,"custome")
+    const apiUrl = `https://api.ratebotai.com:8443/invoice_pms?booking_id=${bookingId}&customer_id=${customer_id}`;
     try {
       const response = await fetch(apiUrl);
       const data = await response.json();
-
+      console.log(response,data,"datuu")
       if (data && data.file) {
         const { file, invoice_number } = data;
         downloadPdf(file, `invoice_${invoice_number}`,);
       } else {
-        console.error('Invalid API response:', data);
+        Alert.alert("Alert","Error Downloading")
       }
     } catch (error) {
       console.error('Error fetching API:', error);
@@ -211,18 +227,10 @@ const CheckOutDetailsScreen = (items) => {
 
 
 
+  console.log(items,data,bookingData,"checkinwer");
 
-  // const handleDownload = () => {
-  //   alert("hiiiiii");
-  // };
-  console.log( bookingData?.booking_status,"checkinwer");
-  // useEffect(()=>{
-  // if(data?.booking_status==="check_in"){
-  //     setBookingStatus("Check In")
-  // }
-  // else
-  // setBookingData("Check Out")
-  // },[bookingStatus])
+
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -232,15 +240,22 @@ const CheckOutDetailsScreen = (items) => {
             marginBottom: 5,
             marginLeft: 10,
             fontWeight: "600",
+            backgroundColor:'#90EE90',
+            padding:5,
+            marginHorizontal:0,
+            borderRadius:5
           }}
         >
           ROOM(S)
         </Text>
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor:'lightblue',marginHorizontal:10 }]}>
           <CheckOutCard checkOutDatas={data} />
         </View>
         <View style={styles.card}>
-          <Text style={{ marginTop: 10, marginBottom: 5, fontWeight: "600" }}>
+          <Text style={{ marginTop: 10, marginBottom: 5, fontWeight: "600", backgroundColor:'#90EE90',
+            padding:5,
+            marginHorizontal:0,
+            borderRadius:5 }}>
             GUEST INFORMATION
           </Text>
           <View style={styles.line}></View>
@@ -250,7 +265,7 @@ const CheckOutDetailsScreen = (items) => {
           )}
         </View>
        
-        <View style={styles.card}>
+             <View style={[styles.card, {backgroundColor:'lightgreen',marginHorizontal:10}]}>
           <View style={styles.balanceAmountpaid}>
             <Text>Room Charge</Text>
             <Text>{bookingData?.charge_till_now?.room_charges}</Text>
@@ -273,8 +288,8 @@ const CheckOutDetailsScreen = (items) => {
           </View>
           <View style={styles.line}></View>
           <View style={styles.balanceAmount}>
-            <Text>Balance Amount</Text>
-            <Text>{bookingData?.charge_till_now?.balance}</Text>
+            <Text  style={{fontSize:15,fontWeight:"600"}}>Balance Amount</Text>
+            <Text  style={{fontSize:15,fontWeight:"600"}}>{bookingData?.charge_till_now?.balance}</Text>
           </View>
         </View>
 
@@ -298,7 +313,7 @@ const CheckOutDetailsScreen = (items) => {
           <View style={styles.bottomButtonsContainer}>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => handleDownload()}
+              onPress={() => handleDownload(bookingData?.booking_id,bookingData?.customer_id)}
             >
               <Text style={styles.buttonText}>DownLoad Invoice</Text>
             </TouchableOpacity>

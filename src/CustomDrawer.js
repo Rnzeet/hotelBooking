@@ -138,9 +138,10 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     marginBottom: 10,
     marginTop: 30,
-    backgroundColor: "#fff",
+    // backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor:'black'
     
   },
   switchTextContainer: {
